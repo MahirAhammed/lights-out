@@ -5,7 +5,7 @@ import secrets
 from database import get_db
 from models import Subscriber
 from schemas import SubscribeRequest, OneTimeEmailRequest
-from email_service import send_verification_email, send_welcome_email, send_one_time_email
+from email_service import send_verification_email, send_welcome_email, send_one_time_email, send_email
 
 router = APIRouter()
 
@@ -59,3 +59,11 @@ async def unsubscribe(token: str, db: AsyncSession = Depends(get_db)):
     subscriber.is_active = False
     await db.commit()
     return {"message": "You've been unsubscribed. Sorry to see you go!"}
+
+
+@router.post("/one-time-email")
+async def one_time_email(request: OneTimeEmailRequest, background_tasks: BackgroundTasks, db: AsyncSession = Depends(get_db)):
+    if request.email_type not in ("standings", "schedule"):
+        raise HTTPException(400, "Invalid email type")
+    background_tasks.add_task(send_one_time_email, request.email, request.email_type, db)
+    return {"message": f"Sending {request.email_type} email to {request.email}"}
