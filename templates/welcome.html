@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Welcome to LightsOut</title>
+<!--[if mso]>
+<noscript>
+<xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml>
+</noscript>
+<![endif]-->
+<style>
+  body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+  table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+  img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
+  body { margin: 0; padding: 0; background-color: #0a0a0a; }
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400&family=Share+Tech+Mono&display=swap');
+</style>
+</head>
+<body style="margin:0;padding:0;background-color:#0a0a0a;font-family:'Barlow',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0a0a0a;">
+  <tr>
+    <td align="center" style="padding: 40px 16px;">
+      <!-- OUTER WRAPPER -->
+      <table role="presentation" width="100%" style="max-width:560px;" cellpadding="0" cellspacing="0">
+        <!-- TOP ACCENT LINE -->
+        <tr>
+          <td style="height:3px;background:#d20c23;font-size:0;line-height:0;">&nbsp;</td>
+        </tr>
+        <!-- HEADER -->
+        <tr>
+          <td style="background-color:#111111;padding:32px 40px 28px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td>
+                  <!-- Logo -->
+                  <span style="font-family:'Barlow Condensed','Arial Narrow',Arial,sans-serif;font-weight:900;font-size:24px;letter-spacing:0.15em;color:#f0f0f0;text-transform:uppercase;text-decoration:none;">
+                    Lights<span style="color:#d20c23;">OUT</span>
+                  </span>
+                </td>
+                <td align="right">
+                  <!-- Round indicator -->
+                  <span style="font-family:'Share Tech Mono','Courier New',monospace;font-size:12px;letter-spacing:0.2em;color:#444;text-transform:uppercase;">
+                    F1 · UPDATES
+                  </span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <!-- THIN RED SEPARATOR -->
+        <tr>
+          <td style="height:1px;background:linear-gradient(to right,#d20c23,#6b0010);font-size:0;line-height:0;">&nbsp;</td>
+        </tr>
+
+        <!-- HERO BLOCK -->
+        <tr>
+          <td style="background-color:#0f0f0f;padding:48px 40px 40px;position:relative;">
+            <!-- Eyebrow -->
+            <!-- <p style="margin:0 0 20px;font-family:'Share Tech Mono','Courier New',monospace;font-size:10px;letter-spacing:0.25em;color:#d20c23;text-transform:uppercase;">
+              // TRANSMISSION RECEIVED
+            </p> -->
+
+            <!-- Headline -->
+            <h1 style="margin:0 0 8px;font-family:'Barlow Condensed','Arial Narrow',Arial,sans-serif;font-weight:900;font-size:45px;line-height:0.92;letter-spacing:-0.02em;color:#f0f0f0;text-transform:uppercase;">
+              FIVE LIGHTS...<br>
+              <span style="color:#d20c23;">YOU'RE IN.</span>
+            </h1>
+
+            <!-- Subline -->
+            <p style="margin:24px 0 0;font-family:'Barlow',Arial,sans-serif;font-weight:300;font-size:16px;line-height:1.7;color:#666;">
+              Welcome{% if name and name != 'onboard' %}, {{ name }}{% endif %}. Race weekends, qualifying results and podium finishes are now headed straight to your inbox.
+            </p>
+          </td>
+        </tr>
+
+        <!-- DIVIDER LINE -->
+        <tr>
+          <td style="height:1px;background:#1e1e1e;font-size:0;line-height:0;">&nbsp;</td>
+        </tr>
+
+        <!-- WHAT TO EXPECT -->
+        <tr>
+          <td style="background-color:#0f0f0f;padding:36px 40px;">
+
+            <p style="margin:0 0 24px;font-family:'Share Tech Mono','Courier New',monospace;font-size:13px;letter-spacing:0.2em;color:#444;text-transform:uppercase;">
+              WHAT HITS YOUR INBOX
+            </p>
+
+            <!-- Item 1 -->
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
+              <tr>
+                <td width="32" valign="top" style="padding-top:2px;">
+                  <div style="width:6px;height:6px;background:#d20c23;transform:rotate(45deg);margin-top:5px;"></div>
+                </td>
+                <td>
+                  <span style="font-family:'Barlow Condensed','Arial Narrow',Arial,sans-serif;font-weight:700;font-size:15px;letter-spacing:0.05em;text-transform:uppercase;color:#f0f0f0;">Race Weekend Preview</span>
+                  <br>
+                  <span style="font-family:'Barlow',Arial,sans-serif;font-weight:300;font-size:13px;color:#555;line-height:1.6;">Track info, session schedule &amp; championship standings — every Thursday.</span>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Item 2 -->
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
+              <tr>
+                <td width="32" valign="top" style="padding-top:2px;">
+                  <div style="width:6px;height:6px;background:#d20c23;transform:rotate(45deg);margin-top:5px;"></div>
+                </td>
+                <td>
+                  <span style="font-family:'Barlow Condensed','Arial Narrow',Arial,sans-serif;font-weight:700;font-size:15px;letter-spacing:0.05em;text-transform:uppercase;color:#f0f0f0;">Qualifying &amp; Race Results</span>
+                  <br>
+                  <span style="font-family:'Barlow',Arial,sans-serif;font-weight:300;font-size:13px;color:#555;line-height:1.6;">Grid positions and final classification, delivered within the hour.</span>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Item 3 -->
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td width="32" valign="top" style="padding-top:2px;">
+                  <div style="width:6px;height:6px;background:#d20c23;transform:rotate(45deg);margin-top:5px;"></div>
+                </td>
+                <td>
+                  <span style="font-family:'Barlow Condensed','Arial Narrow',Arial,sans-serif;font-weight:700;font-size:15px;letter-spacing:0.05em;text-transform:uppercase;color:#f0f0f0;">Sprint Weekends Covered</span>
+                  <br>
+                  <span style="font-family:'Barlow',Arial,sans-serif;font-weight:300;font-size:13px;color:#555;line-height:1.6;">Dedicated sprint result emails so you never miss the short-format action.</span>
+                </td>
+              </tr>
+            </table>
+
+          </td>
+        </tr>
+
+        <!-- DIVIDER LINE -->
+        <tr>
+          <td style="height:1px;background:#1e1e1e;font-size:0;line-height:0;">&nbsp;</td>
+        </tr>
+
+        <!-- PREFERENCE REMINDER -->
+        <tr>
+          <td style="background-color:#111111;padding:28px 40px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="border-left:2px solid #d20c23;padding-left:16px;">
+                  <p style="margin:0 0 4px;font-family:'Barlow Condensed','Arial Narrow',Arial,sans-serif;font-weight:700;font-size:14px;letter-spacing:0.08em;text-transform:uppercase;color:#888;">
+                    YOUR PREFERENCES ARE SAVED
+                  </p>
+                  <p style="margin:0;font-family:'Barlow',Arial,sans-serif;font-weight:300;font-size:13px;color:#555;line-height:1.6;">
+                    You'll only receive the email types you selected. If you ever want to change them or unsubscribe entirely, every email has a link at the bottom.
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- BOTTOM ACCENT -->
+        <tr>
+          <td style="height:1px;background:#1e1e1e;font-size:0;line-height:0;">&nbsp;</td>
+        </tr>
+
+        <!-- FOOTER -->
+        <tr>
+          <td style="background-color:#0a0a0a;padding:28px 40px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td>
+                  <p style="margin:0 0 12px;font-family:'Share Tech Mono','Courier New',monospace;font-size:10px;letter-spacing:0.15em;color:#333;text-transform:uppercase;line-height:1.8;">
+                    You're receiving this because you subscribed to LightsOut.
+                    <br>Data sourced from FastF1 &amp; Jolpi/Ergast API.
+                  </p>
+                  <a href="{{ unsubscribe_url }}"
+                     style="font-family:'Share Tech Mono','Courier New',monospace;font-size:10px;letter-spacing:0.15em;color:#2a5f85;text-decoration:none;text-transform:uppercase;border-bottom:1px solid #2a2a2a;padding-bottom:1px;">
+                    Unsubscribe
+                  </a>
+                </td>
+                <td align="right" valign="bottom">
+                  <span style="font-family:'Barlow Condensed','Arial Narrow',Arial,sans-serif;font-weight:900;font-size:18px;letter-spacing:0.15em;color:#1e1e1e;text-transform:uppercase;">
+                    LIGHTS<span style="color:#2a0a0a;">OUT</span>
+                  </span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- BOTTOM ACCENT LINE -->
+        <tr>
+          <td style="height:2px;background:#1a1a1a;font-size:0;line-height:0;">&nbsp;</td>
+        </tr>
+
+      </table>
+      <!-- END OUTER WRAPPER -->
+
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>
