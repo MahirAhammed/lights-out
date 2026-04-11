@@ -2,9 +2,9 @@ import fastf1
 import httpx
 import asyncio
 from datetime import datetime, timezone
+from constants import FLAGS, CONSTRUCTOR_COLOURS
 
-fastf1.Cache.enable_cache("/tmp/fastf1_cache")
-
+# fastf1.Cache.enable_cache("/tmp/fastf1_cache")
 ERGAST_BASE = "https://api.jolpi.ca/ergast/f1"
 
 def _parse_event_sessions(event) -> dict:
@@ -93,9 +93,16 @@ async def get_driver_standings(year: int) -> list[dict]:
             standings = lists[0]["DriverStandings"]
         result = []
         for entry in standings:
+            nationality = entry["Driver"].get("nationality", "")
             result.append({
                 "position": int(entry["position"]),
-                "driver": f"{entry['Driver']['givenName']} {entry['Driver']['familyName']}",
+                "driver": entry['Driver']['familyName'],
+                "last_round": r.json()["MRData"]["StandingsTable"]["round"],
+                "nationality": nationality,
+                "flag": FLAGS.get(nationality, "🏳️"),
+                "team_colour": CONSTRUCTOR_COLOURS.get(
+                               entry["Constructors"][0]["constructorId"] if entry["Constructors"] else "", "#444"
+                           ),
                 "team": entry["Constructors"][0]["name"] if entry["Constructors"] else "",
                 "points": float(entry["points"]),
                 "wins": int(entry["wins"]),
@@ -109,7 +116,7 @@ async def get_constructor_standings(year: int) -> list[dict]:
     try:
         async with httpx.AsyncClient() as client:
             r = await client.get(
-                f"{ERGAST_BASE}/{year}/constructorStandings.json",
+                f"{ERGAST_BASE}/{year}/constructorstandings.json",
                 timeout=10.0
             )
             r.raise_for_status()
@@ -123,9 +130,10 @@ async def get_constructor_standings(year: int) -> list[dict]:
                 "position": int(entry["position"]),
                 "team": entry["Constructor"]["name"],
                 "points": float(entry["points"]),
-                "wins": int(entry["wins"]),
+                "colour": CONSTRUCTOR_COLOURS.get(entry["Constructor"]["constructorId"], "#444"),
             })
-        return result[:10]
+
+        return result[:11]
     except Exception:
         return []
 

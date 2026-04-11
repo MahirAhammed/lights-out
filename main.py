@@ -23,6 +23,7 @@ app.add_middleware(
 )
 
 app.include_router(subscribers.router, prefix="/api/v1/subscribers", tags=["subscribers"])
+app.include_router(admin.router, prefix="/api/v1/admin", tags=["admin"])
 
 @app.get("/health")
 async def health():

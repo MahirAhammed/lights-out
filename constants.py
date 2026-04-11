@@ -20,7 +20,7 @@ CONSTRUCTOR_COLOURS = {
     "rb":               "#6692FF",
     "williams":         "#64C4FF",
     "audi":             "#454A45",
-    "cadillac":         "#888C25"
+    "cadillac":         "#A89C1C"
 }
 
 NATIONAL_FLAGS = {
@@ -32,6 +32,6 @@ NATIONAL_FLAGS = {
     "Italy":          "🇮🇹", "Argentina":      "🇦🇷", "Brazil":         "🇧🇷",
     "Austria":        "🇦🇹", "Belgium":        "🇧🇪", "New Zealand":    "🇳🇿",
     "Switzerland":    "🇨🇭", "Poland":         "🇵🇱", "Sweden":         "🇸🇪",
-    "United Arab Emirates" : "", "Qatar": "", "Singapore": "",
-    "Azerbaijan": "", "Hungary": "",
+    "United Arab Emirates" : "🇦🇪", "Qatar": "🇶🇦", "Singapore": "🇸🇬",
+    "Azerbaijan": "🇦🇿", "Hungary": "🇭🇺",
 }
