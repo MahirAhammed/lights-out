@@ -183,14 +183,10 @@ async def send_one_time_email(to: str, email_type: str, db: AsyncSession):
         )
 
 def _should_receive(subscriber, email_type: str) -> bool:
-    from models import EmailPreference
-    if subscriber.email_preference == EmailPreference.all:
-        return True
-    if subscriber.email_preference == EmailPreference.pre_race_only:
-        return email_type == "pre_race"
-    if subscriber.email_preference == EmailPreference.results_only:
-        return email_type in ("qualifying", "race")
-    if subscriber.email_preference == EmailPreference.custom:
-        prefs = subscriber.custom_prefs or {}
-        return prefs.get(email_type, True)
-    return True
+    prefs = {
+        "pre_race":   subscriber.pref_pre_race,
+        "qualifying": subscriber.pref_qualifying,
+        "race":       subscriber.pref_race,
+        "sprint":     subscriber.pref_sprint,
+    }
+    return prefs.get(email_type, True)

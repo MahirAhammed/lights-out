@@ -6,12 +6,6 @@ import uuid, enum
 
 Base = declarative_base()
 
-class EmailPreference(str, enum.Enum):
-    all = "all"
-    pre_race_only = "pre_race_only"
-    results_only = "results_only"
-    custom = "custom"
-
 class Subscriber(Base):
     __tablename__ = "subscribers"
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -19,8 +13,10 @@ class Subscriber(Base):
     name = Column(String, nullable=True)
     timezone = Column(String, default="UTC")
     country = Column(String, nullable=True)
-    email_preference = Column(Enum(EmailPreference), default=EmailPreference.all)
-    custom_prefs = Column(JSON, default={})  # e.g. {"pre_race": True, "quali": False, "race": True}
+    pref_pre_race       = Column(Boolean, default=True)
+    pref_qualifying     = Column(Boolean, default=True)
+    pref_race           = Column(Boolean, default=True)
+    pref_sprint         = Column(Boolean, default=True)
     verified = Column(Boolean, default=False)
     verification_token = Column(String, nullable=True)
     unsubscribe_token = Column(String, nullable=True)

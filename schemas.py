@@ -1,14 +1,14 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
-from models import EmailPreference
 
 class SubscribeRequest(BaseModel):
     email: EmailStr
-    name: Optional[str] = None
-    timezone: Optional[str] = "UTC"
-    country: Optional[str] = None
-    email_preference: EmailPreference = EmailPreference.all
-    custom_prefs: Optional[dict] = None
+    name: Optional[str] = Field(None, max_length = 50)
+    timezone: Optional[str] = Field("UTC", max_length=30)
+    pref_pre_race: bool = True
+    pref_qualifying: bool = True
+    pref_race: bool = True
+    pref_sprint: bool = True
 
 class OneTimeEmailRequest(BaseModel):
     email: EmailStr

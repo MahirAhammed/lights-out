@@ -26,9 +26,10 @@ async def subscribe(request: SubscribeRequest, background_tasks: BackgroundTasks
         email=request.email,
         name=request.name,
         timezone=request.timezone or "UTC",
-        country=request.country,
-        email_preference=request.email_preference,
-        custom_prefs=request.custom_prefs or {},
+        pref_pre_race       = request.pref_pre_race,
+        pref_qualifying     = request.pref_qualifying,
+        pref_race           = request.pref_race,
+        pref_sprint         = request.pref_sprint,
         verification_token=verification_token,
         unsubscribe_token=unsubscribe_token,
     )
@@ -61,7 +62,7 @@ async def unsubscribe(token: str, db: AsyncSession = Depends(get_db)):
     return {"message": "You've been unsubscribed. Sorry to see you go!"}
 
 
-@router.post("/one_time")
+@router.post("/onetime")
 async def one_time_email(request: OneTimeEmailRequest, background_tasks: BackgroundTasks, db: AsyncSession = Depends(get_db)):
     if request.email_type not in ("standings", "schedule"):
         raise HTTPException(400, "Invalid email type")
