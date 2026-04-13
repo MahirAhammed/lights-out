@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+sqlalchemy[asyncio]
+asyncpg
+pydantic[email]
+pydantic-settings
+fastf1
+httpx
+resend
+apscheduler
+jinja2
+python-multipart
+itsdangerous
+pytz
+slowapi
