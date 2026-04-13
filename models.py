@@ -1,8 +1,8 @@
-from sqlalchemy import Column, String, Boolean, DateTime, Enum, Text, JSON
+from sqlalchemy import Column, String, Boolean, DateTime, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
-import uuid, enum
+import uuid
 
 Base = declarative_base()
 
@@ -12,11 +12,10 @@ class Subscriber(Base):
     email = Column(String, unique=True, nullable=False, index=True)
     name = Column(String, nullable=True)
     timezone = Column(String, default="UTC")
-    country = Column(String, nullable=True)
-    pref_pre_race       = Column(Boolean, default=True)
-    pref_qualifying     = Column(Boolean, default=True)
-    pref_race           = Column(Boolean, default=True)
-    pref_sprint         = Column(Boolean, default=True)
+    pref_pre_race = Column(Boolean, default=True)
+    pref_qualifying = Column(Boolean, default=True)
+    pref_race = Column(Boolean, default=True)
+    pref_sprint = Column(Boolean, default=True)
     verified = Column(Boolean, default=False)
     verification_token = Column(String, nullable=True)
     unsubscribe_token = Column(String, nullable=True)
@@ -32,5 +31,5 @@ class EmailLog(Base):
     race_name = Column(String, nullable=True)
     sent_at = Column(DateTime(timezone=True), server_default=func.now())
     resend_id = Column(String, nullable=True)
-    status = Column(String, default="sent")  # sent, failed, bounced
+    status = Column(String, default="sent")
     error_message = Column(Text, nullable=True)
