@@ -105,7 +105,7 @@ def get_track_info(year: int, round_number: int) -> dict:
         "country": event["Country"],
         "location": event["Location"],
         "round": int(event["RoundNumber"]),
-        "total_laps": total_laps,
+        # "total_laps": total_laps,
         "corners": corner_count,
         "last_winner": last_winner,
         "is_sprint": session_info["is_sprint"],
