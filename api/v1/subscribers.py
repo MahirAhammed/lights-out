@@ -18,9 +18,9 @@ router = APIRouter()
 VERIFICATION_EXPIRATION = 24
 
 @router.post("/subscribe")
-@limiter.limit("2/minute;5/hour")
-async def subscribe(request: SubscribeRequest, background_tasks: BackgroundTasks, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Subscriber).where(Subscriber.email == request.email))
+@limiter.limit("3/hour")
+async def subscribe(request: Request, request_type: SubscribeRequest, background_tasks: BackgroundTasks, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Subscriber).where(Subscriber.email == request_type.email))
     existing = result.scalar_one_or_none()
     if existing:
         if existing.verified:
@@ -41,23 +41,24 @@ async def subscribe(request: SubscribeRequest, background_tasks: BackgroundTasks
     verification_token = secrets.token_urlsafe(32)
     unsubscribe_token = secrets.token_urlsafe(32)
     subscriber = Subscriber(
-        email=request.email,
-        name=request.name,
-        timezone=request.timezone or "UTC",
-        pref_pre_race = request.pref_pre_race,
-        pref_qualifying = request.pref_qualifying,
-        pref_race = request.pref_race,
-        pref_sprint = request.pref_sprint,
+        email=request_type.email,
+        name=request_type.name,
+        timezone=request_type.timezone or "UTC",
+        pref_pre_race = request_type.pref_pre_race,
+        pref_qualifying = request_type.pref_qualifying,
+        pref_race = request_type.pref_race,
+        pref_sprint = request_type.pref_sprint,
         verification_token = verification_token,
         unsubscribe_token = unsubscribe_token,
     )
     db.add(subscriber)
     await db.commit()
-    background_tasks.add_task(send_verification_email, request.email, request.name or "F1 Fan", verification_token, db)
+    background_tasks.add_task(send_verification_email, request_type.email, request_type.name or "F1 Fan", verification_token, db)
     return {"message": "Please check your email to verify your subscription"}
 
 @router.get("/verify")
-async def verify(token: str, db: AsyncSession = Depends(get_db)):
+@limiter.limit("5/minute")
+async def verify(request: Request, token: str, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Subscriber).where(Subscriber.verification_token == token))
     subscriber = result.scalar_one_or_none()
     if not subscriber:
@@ -84,7 +85,8 @@ async def verify(token: str, db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/unsubscribe")
-async def unsubscribe(token: str, db: AsyncSession = Depends(get_db)):
+@limiter.limit("5/minute")
+async def unsubscribe(request: Request, token: str, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Subscriber).where(Subscriber.unsubscribe_token == token))
     subscriber = result.scalar_one_or_none()
     if not subscriber:
@@ -99,9 +101,9 @@ async def unsubscribe(token: str, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/onetime")
-@limiter.limit("3/minute;5/hour")
-async def one_time_email(request: OneTimeEmailRequest, background_tasks: BackgroundTasks, db: AsyncSession = Depends(get_db)):
-    if request.email_type not in ("standings", "schedule"):
+@limiter.limit("5/hour")
+async def one_time_email(request: Request, request_type: OneTimeEmailRequest, background_tasks: BackgroundTasks, db: AsyncSession = Depends(get_db)):
+    if request_type.email_type not in ("standings", "schedule"):
         raise HTTPException(400, "Invalid email type")
-    background_tasks.add_task(send_one_time_email, request.email, request.email_type, db)
-    return {"message": f"Sending {request.email_type} email to {request.email}"}
+    background_tasks.add_task(send_one_time_email, request_type.email, request_type.email_type, db)
+    return {"message": f"Sending {request_type.email_type} email to {request_type.email}"}
