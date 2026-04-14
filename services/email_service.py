@@ -1,7 +1,7 @@
 import resend
 from jinja2 import Environment, FileSystemLoader
-from config import settings
-from database import AsyncSessionLocal
+from config.config import settings
+from config.database import AsyncSessionLocal
 from models import EmailLog, Subscriber
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -128,9 +128,9 @@ async def send_sprint_results_email(subscribers: list[Subscriber], data: dict, d
 
 # ONE TIME EMAILS
 async def send_one_time_email(to: str, email_type: str, db: AsyncSession):
-    from f1_data import (get_driver_standings, get_constructor_standings, get_current_season_schedule)
+    from services.f1_data import (get_driver_standings, get_constructor_standings, get_current_season_schedule)
     from datetime import datetime, timezone
-    from constants import NATIONAL_FLAGS
+    from utils.constants import NATIONAL_FLAGS
 
     year = datetime.now(timezone.utc).year
 

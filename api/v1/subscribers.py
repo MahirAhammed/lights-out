@@ -3,11 +3,11 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 import secrets
-from database import get_db
+from config.database import get_db
 from models import Subscriber
 from schemas import SubscribeRequest, OneTimeEmailRequest
-from email_service import send_verification_email, send_welcome_email, send_one_time_email
-from config import settings
+from services.email_service import send_verification_email, send_welcome_email, send_one_time_email
+from config.config import settings
 from datetime import datetime, timezone, timedelta
 from slowapi import Limiter
 from slowapi.util import get_remote_address

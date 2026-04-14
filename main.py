@@ -1,11 +1,11 @@
-from backend.api.v1 import subscribers
+from api.v1 import subscribers
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from database import engine
+from config.database import engine
 from models import Base
-from scheduler import start_scheduler
-from config import settings
+from services.scheduler import start_scheduler
+from config.config import settings
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded

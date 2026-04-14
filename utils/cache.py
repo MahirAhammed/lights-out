@@ -1,7 +1,7 @@
 from datetime import datetime, timezone, timedelta
 from sqlalchemy import select, delete
 from models import Cache
-from database import AsyncSessionLocal
+from config.database import AsyncSessionLocal
 
 async def cache_get(key: str) -> dict | list | None:
     async with AsyncSessionLocal() as db:

@@ -2,7 +2,7 @@ import fastf1
 import httpx
 import asyncio
 from datetime import datetime, timezone
-from constants import FLAGS, CONSTRUCTOR_COLOURS
+from utils.constants import FLAGS, CONSTRUCTOR_COLOURS
 
 # fastf1.Cache.enable_cache("/tmp/fastf1_cache")
 ERGAST_BASE = "https://api.jolpi.ca/ergast/f1"
