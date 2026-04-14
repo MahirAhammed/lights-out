@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Qualifying Results — LightsOut</title>
+<style>
+  body, table, td { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+  table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+  body { margin: 0; padding: 0; background-color: #0a0a0a; }
+</style>
+</head>
+<body style="margin:0;padding:0;background-color:#0a0a0a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0a0a0a;">
+  <tr>
+    <td align="center" style="padding:32px 12px;">
+      <table role="presentation" width="100%" style="max-width:540px;" cellpadding="0" cellspacing="0">
+
+        <!-- TOP BAR -->
+        <tr><td style="height:3px;background:#E8001D;font-size:0;line-height:0;">&nbsp;</td></tr>
+
+        <!-- HEADER -->
+        <tr>
+          <td style="background:#111;padding:24px 32px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td>
+                  <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:22px;letter-spacing:0.15em;color:#f0f0f0;text-transform:uppercase;">
+                    LIGHTS<span style="color:#E8001D;">OUT</span>
+                  </span>
+                </td>
+                <td align="right">
+                  <span style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.16em;color:#333;text-transform:uppercase;">
+                    {% if is_sprint_quali %}SPRINT SHOOTOUT{% else %}QUALIFYING{% endif %}
+                    · Round {{ round }}
+                  </span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <tr><td style="height:1px;background:linear-gradient(to right,#E8001D,#3a0008);font-size:0;line-height:0;">&nbsp;</td></tr>
+
+        <!-- HERO -->
+        <tr>
+          <td style="background:#0f0f0f;padding:36px 32px 28px;">
+            <p style="margin:0 0 12px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.22em;color:#E8001D;text-transform:uppercase;">
+              // {% if is_sprint_quali %}SPRINT SHOOTOUT RESULTS{% else %}QUALIFYING RESULTS{% endif %}
+            </p>
+            <h1 style="margin:0 0 8px;font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:44px;line-height:0.92;letter-spacing:-0.02em;color:#f0f0f0;text-transform:uppercase;">
+              {{ race_name | upper }}<br>
+              <span style="color:#E8001D;">GRID SET.</span>
+            </h1>
+            <p style="margin:10px 0 0;font-family:'Courier New',monospace;font-size:10px;color:#444;">
+              {{ year }} season · Round {{ round }}
+            </p>
+          </td>
+        </tr>
+
+        <tr><td style="height:1px;background:#1a1a1a;font-size:0;line-height:0;">&nbsp;</td></tr>
+
+        <!-- POLE POSITION -->
+        {% if results %}
+        <tr>
+          <td style="background:#0d0d0d;padding:20px 32px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="border-left:2px solid #E8001D;padding-left:14px;">
+                  <p style="margin:0 0 3px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.18em;color:#333;text-transform:uppercase;">
+                    Pole position
+                  </p>
+                  <p style="margin:0;font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:20px;letter-spacing:0.02em;text-transform:uppercase;color:#f0f0f0;">
+                    {{ results[0].driver }}
+                  </p>
+                  <p style="margin:4px 0 0;font-family:'Courier New',monospace;font-size:10px;color:#444;">
+                    {{ results[0].team }}
+                    {% if results[0].q3 and results[0].q3 != '-' %}
+                    &nbsp;·&nbsp; {{ results[0].q3 }}
+                    {% endif %}
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr><td style="height:1px;background:#1a1a1a;font-size:0;line-height:0;">&nbsp;</td></tr>
+        {% endif %}
+
+        <!-- GRID -->
+        <tr>
+          <td style="background:#0f0f0f;padding:24px 32px;">
+            <p style="margin:0 0 14px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.2em;color:#333;text-transform:uppercase;">FULL GRID</p>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+
+              <!-- Column headers -->
+              <tr>
+                <td width="30" style="padding:0 0 8px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.1em;color:#222;text-transform:uppercase;">P</td>
+                <td style="padding:0 0 8px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.1em;color:#222;text-transform:uppercase;">Driver</td>
+                <td align="right" width="52" style="padding:0 0 8px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.1em;color:#222;text-transform:uppercase;">Q1</td>
+                <td align="right" width="52" style="padding:0 0 8px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.1em;color:#222;text-transform:uppercase;">Q2</td>
+                <td align="right" width="52" style="padding:0 0 8px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.1em;color:#222;text-transform:uppercase;">Q3</td>
+              </tr>
+
+              {% for r in results %}
+              {% set top3 = r.position <= 3 %}
+              <tr style="border-bottom:1px solid #141414;">
+
+                <td style="padding:9px 0 9px 4px;vertical-align:middle;">
+                  <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;
+                    font-size:{% if top3 %}17px{% else %}13px{% endif %};
+                    color:{% if r.position == 1 %}#C9A84C{% elif r.position == 2 %}#9E9E9E{% elif r.position == 3 %}#8B5A2B{% else %}#2e2e2e{% endif %};">
+                    {{ r.position }}
+                  </span>
+                </td>
+
+                <td style="padding:9px 8px 9px 0;vertical-align:middle;">
+                  <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:0.03em;text-transform:uppercase;
+                    color:{% if top3 %}#e0e0e0{% elif r.position <= 10 %}#555{% else %}#2e2e2e{% endif %};">
+                    {{ r.abbreviation }}
+                  </span>
+                  <span style="font-family:'Courier New',monospace;font-size:9px;color:#222;margin-left:6px;">
+                    {{ r.team | truncate(10, true, '') }}
+                  </span>
+                </td>
+
+                <td align="right" style="padding:9px 2px;font-family:'Courier New',monospace;font-size:9px;
+                  color:{% if r.q1 and r.q1 != '-' %}#333{% else %}#1e1e1e{% endif %};">
+                  {{ r.q1 if r.q1 and r.q1 != '-' else '—' }}
+                </td>
+                <td align="right" style="padding:9px 2px;font-family:'Courier New',monospace;font-size:9px;
+                  color:{% if r.q2 and r.q2 != '-' %}#333{% else %}#1e1e1e{% endif %};">
+                  {{ r.q2 if r.q2 and r.q2 != '-' else '—' }}
+                </td>
+                <td align="right" style="padding:9px 4px;font-family:'Courier New',monospace;font-size:9px;
+                  color:{% if r.q3 and r.q3 != '-' %}#777{% else %}#1e1e1e{% endif %};">
+                  {{ r.q3 if r.q3 and r.q3 != '-' else '—' }}
+                </td>
+
+              </tr>
+              {% endfor %}
+            </table>
+          </td>
+        </tr>
+
+        <tr><td style="height:1px;background:#1a1a1a;font-size:0;line-height:0;">&nbsp;</td></tr>
+
+        <!-- FOOTER -->
+        <tr>
+          <td style="background:#0a0a0a;padding:22px 32px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td>
+                  <p style="margin:0;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.12em;color:#282828;text-transform:uppercase;line-height:1.8;">
+                    You subscribed at lightsout.vercel.app<br>
+                    <a href="{{ unsubscribe_url }}" style="color:#282828;text-decoration:none;">Unsubscribe</a>
+                  </p>
+                </td>
+                <td align="right" valign="bottom">
+                  <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:16px;letter-spacing:0.15em;color:#1a1a1a;text-transform:uppercase;">
+                    LIGHTS<span style="color:#200606;">OUT</span>
+                  </span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <tr><td style="height:2px;background:#141414;font-size:0;line-height:0;">&nbsp;</td></tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>
