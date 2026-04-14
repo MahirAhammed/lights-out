@@ -69,11 +69,45 @@ def get_next_race() -> dict | None:
 def get_track_info(year: int, round_number: int) -> dict:
     event = fastf1.get_event(year, round_number)
     session_info = _parse_event_sessions(event)
+
+    current_race = fastf1.get_session(year, round_number, 'R')
+    current_race.load(laps=True, telemetry=False, weather=False, messages=False)
+    # total_laps = current_race.total_laps
+    # Get corner count if available
+    try:
+        circuit_info = current_race.get_circuit_info()
+        corner_count = len(circuit_info.corners) if circuit_info else "N/A"
+    except Exception:
+        corner_count = "N/A"
+
+    last_winner = None
+    lookback_years = 10
+    for i in range(1, lookback_years + 1):
+        try:
+            prev_year = year - i
+            prev_race = fastf1.get_session(prev_year, round_number, 'R')
+            prev_race.load(laps=False, telemetry=False, weather=False, messages=False)
+            
+            # Check if this is the correct GP
+            if prev_race.event['EventName'] == event['EventName']:
+                winner_row = prev_race.results.iloc[0]
+                last_winner = {
+                    "driver": winner_row["FullName"],
+                    "team": winner_row["TeamName"],
+                    "year": prev_year
+                }
+                break # Exit loop once we find the most recent winner
+        except Exception:
+            continue
     return {
         "name": event["EventName"],
         "official_name": event.get("OfficialEventName", event["EventName"]),
         "country": event["Country"],
         "location": event["Location"],
+        "round": int(event["RoundNumber"]),
+        "total_laps": total_laps,
+        "corners": corner_count,
+        "last_winner": last_winner,
         "is_sprint": session_info["is_sprint"],
         "sessions": session_info["sessions"],
     }
@@ -97,7 +131,7 @@ async def get_driver_standings(year: int) -> list[dict]:
             result.append({
                 "position": int(entry["position"]),
                 "driver": entry['Driver']['familyName'],
-                "last_round": r.json()["MRData"]["StandingsTable"]["round"],
+                # "last_round": r.json()["MRData"]["StandingsTable"].get("round"),
                 "nationality": nationality,
                 "flag": FLAGS.get(nationality, "🏳️"),
                 "team_colour": CONSTRUCTOR_COLOURS.get(
