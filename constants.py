@@ -1,3 +1,23 @@
+# Time conversion to seconds
+HOUR  = 3600
+DAY   = 86400
+WEEK  = 604800
+MONTH = 2592000
+
+CACHE_TTL = {
+    "schedule":               MONTH,
+    "current_race_weekend":   WEEK,
+    "driver_standings":       WEEK,
+    "constructor_standings":  WEEK,
+}
+
+# Hours to wait after session START time before fetching results
+SESSION_RESULT_OFFSET = {
+    "Sprint":      HOUR * 2,
+    "Qualifying":  HOUR * 2,
+    "Race":        HOUR * 3,
+}
+
 FLAGS = {
     "British":      "🇬🇧", "Dutch":        "🇳🇱", "Monegasque":   "🇲🇨",
     "Spanish":      "🇪🇸", "Australian":   "🇦🇺", "Mexican":      "🇲🇽",
@@ -10,17 +30,17 @@ FLAGS = {
 }
 
 CONSTRUCTOR_COLOURS = {
-    "red_bull":         "#3671C6",
-    "mclaren":          "#FF8000",
+    "red_bull":         "#25487A",
+    "mclaren":          "#FF8800",
     "ferrari":          "#E8002D",
-    "mercedes":         "#27F4D2",
+    "mercedes":         "#75F1D3",
     "aston_martin":     "#229971",
-    "alpine ":          "#FF87BC",
-    "haas":             "#B6BABD",
+    "alpine":           "#FF87BC",
+    "haas":             "#EAEAEA",
     "rb":               "#6692FF",
-    "williams":         "#64C4FF",
-    "audi":             "#454A45",
-    "cadillac":         "#A89C1C"
+    "williams":         "#005CAA",
+    "audi":             "#5D615D",
+    "cadillac":         "#BE991E"
 }
 
 NATIONAL_FLAGS = {

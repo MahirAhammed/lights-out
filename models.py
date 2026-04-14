@@ -1,5 +1,5 @@
 from sqlalchemy import Column, String, Boolean, DateTime, Text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
 import uuid
@@ -33,3 +33,12 @@ class EmailLog(Base):
     resend_id = Column(String, nullable=True)
     status = Column(String, default="sent")
     error_message = Column(Text, nullable=True)
+
+
+class Cache(Base):
+    __tablename__ = "cache"
+    key           = Column(String, primary_key=True)
+    value         = Column(JSONB, nullable=False)
+    expires_at    = Column(DateTime(timezone=True), nullable=False)
+    updated_at    = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    force_refresh = Column(Boolean, default=False)
