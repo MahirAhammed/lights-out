@@ -34,7 +34,6 @@ async def subscribe(request: Request, request_type: SubscribeRequest, background
             existing.email,
             existing.name or "F1 Fan",
             existing.verification_token,
-            db
         )
         return {"message": "Verification email sent. Please check your inbox."}
 
