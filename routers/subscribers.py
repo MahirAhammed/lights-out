@@ -9,11 +9,16 @@ from schemas import SubscribeRequest, OneTimeEmailRequest
 from email_service import send_verification_email, send_welcome_email, send_one_time_email
 from config import settings
 from datetime import datetime, timezone, timedelta
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from fastapi import Request
 
+limiter = Limiter(key_func=get_remote_address)
 router = APIRouter()
 VERIFICATION_EXPIRATION = 24
 
 @router.post("/subscribe")
+@limiter.limit("2/minute;5/hour")
 async def subscribe(request: SubscribeRequest, background_tasks: BackgroundTasks, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Subscriber).where(Subscriber.email == request.email))
     existing = result.scalar_one_or_none()
@@ -21,7 +26,6 @@ async def subscribe(request: SubscribeRequest, background_tasks: BackgroundTasks
         if existing.verified:
             raise HTTPException(400, "Already subscribed")
         # Resend verification
-        # Unverified — refresh token and resend
         existing.verification_token = secrets.token_urlsafe(32)
         existing.created_at = datetime.now(timezone.utc)   # reset expiry clock
         await db.commit()
@@ -95,6 +99,7 @@ async def unsubscribe(token: str, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/onetime")
+@limiter.limit("3/minute;5/hour")
 async def one_time_email(request: OneTimeEmailRequest, background_tasks: BackgroundTasks, db: AsyncSession = Depends(get_db)):
     if request.email_type not in ("standings", "schedule"):
         raise HTTPException(400, "Invalid email type")
