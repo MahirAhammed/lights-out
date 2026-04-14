@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Championship Standings -- LightsOut</title>
+<style>
+  body, table, td { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+  table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+  body { margin: 0; padding: 0; background-color: #0a0a0a; }
+</style>
+</head>
+<body style="margin:0;padding:0;background-color:#0a0a0a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0a0a0a;">
+  <tr>
+    <td align="center" style="padding:25px 12px;">
+      <table role="presentation" width="100%" style="max-width:540px;" cellpadding="0" cellspacing="0">
+
+        <!-- TOP BAR -->
+        <tr><td style="height:3px;background:#D20C23;font-size:0;line-height:0;">&nbsp;</td></tr>
+
+        <!-- HEADER -->
+        <tr>
+          <td style="background:#111;padding:24px 32px;">
+            <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:22px;letter-spacing:0.15em;color:#f0f0f0;text-transform:uppercase;">
+              LIGHTS<span style="color:#D20C23;">OUT</span>
+            </span>
+          </td>
+        </tr>
+
+        <tr><td style="height:1px;background:linear-gradient(to right,#D20C23,#3a0008);font-size:0;line-height:0;">&nbsp;</td></tr>
+
+        <!-- HERO -->
+        <tr>
+          <td style="background:#0f0f0f;padding:36px 32px 28px;">
+            <p style="margin:0 0 12px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.22em;color:#D20C23;text-transform:uppercase;">
+              // CHAMPIONSHIP STANDINGS
+            </p>
+            <h1 style="margin:0 0 10px;font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:44px;line-height:0.92;letter-spacing:-0.02em;color:#f0f0f0;text-transform:uppercase;">
+              {{ year }}<br><span style="color:#D20C23;">SEASON.</span>
+            </h1>
+            <p style="margin:0;font-family:'Courier New',monospace;font-size:10px;color:#444;">
+              After round {{ last_round }} / {{ total_rounds }}
+            </p>
+          </td>
+        </tr>
+
+        <tr><td style="height:1px;background:#672929;font-size:0;line-height:0;">&nbsp;</td></tr>
+
+        <!-- DRIVERS -->
+        <tr>
+          <td style="background:#0f0f0f;padding:28px 32px;">
+            <p style="margin:0 0 16px;font-family:'Courier New',monospace;font-size:15px;letter-spacing:0.2em;color:#333;text-transform:uppercase;">DRIVERS</p>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+
+              <!-- Header row -->
+              <tr>
+                <td width="32" style="padding:0 0 8px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.12em;color:#222;text-transform:uppercase;">POS</td>
+                <td style="padding:0 0 8px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.12em;color:#222;text-transform:uppercase;">DRIVER</td>
+                <td style="padding:0 0 8px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.12em;color:#222;text-transform:uppercase;">TEAM</td>
+                <td align="right" width="44" style="padding:0 0 8px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.12em;color:#222;text-transform:uppercase;">PTS</td>
+              </tr>
+
+              {% for d in driver_standings %}
+              {% set top3 = d.position <= 3 %}
+              <tr style="border-bottom:1px solid #141414;">
+
+                <td style="padding:5px 0 5px 4px;vertical-align:middle;">
+                  <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:{% if top3 %}18px{% else %}13px{% endif %};
+                    color:{% if d.position == 1 %}#C9A84C{% elif d.position == 2 %}#9E9E9E{% elif d.position == 3 %}#8B5A2B{% else %}#2e2e2e{% endif %};">
+                    {{ d.position }}
+                  </span>
+                </td>
+
+                <td style="padding:10px 8px 10px 0;vertical-align:middle;">
+                  <span style="display:inline-block;width:3px;height:13px;background:{{ d.team_colour }};vertical-align:middle;margin-right:8px;"></span>
+                  <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:0.03em;text-transform:uppercase;
+                    color:{% if top3 %}#e0e0e0{% else %}#555{% endif %};">
+                    {{ d.driver }}
+                  </span>
+                </td>
+
+                <td style="padding:10px 8px 10px 0;vertical-align:middle;">
+                  <span style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.04em;
+                    color:{% if top3 %}#3a3a3a{% else %}#222{% endif %};">
+                    {{ d.team | truncate(12, true, '') }}
+                  </span>
+                </td>
+
+                <td align="right" style="padding:10px 4px;vertical-align:middle;">
+                  <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:{% if top3 %}15px{% else %}13px{% endif %};
+                    color:{% if d.position == 1 %}#C9A84C{% elif top3 %}#777{% else %}#333{% endif %};">
+                    {{ d.points | int }}
+                  </span>
+                </td>
+
+              </tr>
+              {% endfor %}
+            </table>
+          </td>
+        </tr>
+
+        <tr><td style="height:1px;background:#1a1a1a;font-size:0;line-height:0;">&nbsp;</td></tr>
+
+        <!-- CONSTRUCTORS -->
+        <tr>
+          <td style="background:#0d0d0d;padding:28px 32px;">
+            <p style="margin:0 0 16px;font-family:'Courier New',monospace;font-size:15px;letter-spacing:0.2em;color:#333;text-transform:uppercase;">CONSTRUCTORS</p>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+
+              <tr>
+                <td width="32" style="padding:0 0 8px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.12em;color:#222;text-transform:uppercase;">POS</td>
+                <td style="padding:0 0 8px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.12em;color:#222;text-transform:uppercase;">CONSTRUCTOR</td>
+                <td align="right" width="44" style="padding:0 0 8px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.12em;color:#222;text-transform:uppercase;">PTS</td>
+              </tr>
+
+              {% for c in constructor_standings %}
+              {% set top3 = c.position <= 3 %}
+              <tr style="border-bottom:1px solid #141414;border-left:3px solid {{ c.colour }};">
+
+                <td style="padding:10px 0 10px 10px;vertical-align:middle;">
+                  <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:{% if top3 %}18px{% else %}13px{% endif %};
+                    color:{% if c.position == 1 %}#C9A84C{% elif c.position == 2 %}#9E9E9E{% elif c.position == 3 %}#8B5A2B{% else %}#2e2e2e{% endif %};">
+                    {{ c.position }}
+                  </span>
+                </td>
+
+                <td style="padding:10px 8px 10px 0;vertical-align:middle;">
+                  <span style="display:inline-block;width:3px;height:13px;background:{{ c.colour }};vertical-align:middle;margin-right:8px;"></span>
+                  <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:0.03em;text-transform:uppercase;
+                    color:{% if top3 %}#e0e0e0{% else %}#555{% endif %};">
+                    {{ c.team }}
+                  </span>
+                </td>
+
+                <td align="right" style="padding:10px 4px;vertical-align:middle;">
+                  <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:{% if top3 %}15px{% else %}13px{% endif %};
+                    color:{% if c.position == 1 %}#C9A84C{% elif top3 %}#777{% else %}#333{% endif %};">
+                    {{ c.points | int }}
+                  </span>
+                </td>
+
+              </tr>
+              {% endfor %}
+            </table>
+          </td>
+        </tr>
+
+        <tr><td style="height:1px;background:#1a1a1a;font-size:0;line-height:0;">&nbsp;</td></tr>
+
+        <!-- FOOTER -->
+        <tr>
+          <td style="background:#0a0a0a;padding:22px 32px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td>
+                  <p style="margin:0;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.12em;color:#282828;text-transform:uppercase;line-height:1.8;">
+                    One-time email from LightsOut.<br>
+                    Data sourced from Jolpi/Ergast API.
+                  </p>
+                </td>
+                <td align="right" valign="bottom">
+                  <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:16px;letter-spacing:0.15em;color:#1a1a1a;text-transform:uppercase;">
+                    LIGHTS<span style="color:#200606;">OUT</span>
+                  </span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <tr><td style="height:2px;background:#141414;font-size:0;line-height:0;">&nbsp;</td></tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>
