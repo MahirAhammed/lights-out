@@ -1,10 +1,10 @@
+from backend.api.v1 import subscribers
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from database import engine
 from models import Base
 from scheduler import start_scheduler
-from routers import subscribers, admin
 from config import settings
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
@@ -31,7 +31,6 @@ app.add_middleware(
 )
 
 app.include_router(subscribers.router, prefix="/api/v1/subscribers", tags=["subscribers"])
-app.include_router(admin.router, prefix="/api/v1/admin", tags=["admin"])
 
 @app.get("/health")
 async def health():
