@@ -1,5 +1,5 @@
 from api.v1 import subscribers
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Header, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
@@ -39,11 +39,15 @@ app.add_middleware(
     allow_origins=[settings.frontend_url, "http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["Content-type"],
+    allow_headers=["Content-type", "Random-token"],
 )
 
 app.include_router(subscribers.router, prefix="/api/v1/subscribers", tags=["subscribers"])
 
 @app.get("/health")
-async def health():
+async def health(token: str = Header(None)):
+    expected_token = settings.secret_key
+    if not token or token != expected_token:
+        raise HTTPException(401, detail="Unauthorized access")
+    
     return {"status": "ok"}
