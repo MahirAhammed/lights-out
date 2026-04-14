@@ -2,6 +2,8 @@
 
 F1 email update service. Sends subscribers automated emails before and after every race weekend -- pre-race previews, qualifying results, sprint results, and race results. Standings and season schedule available as one-time emails with no account required.
 
+**Website:** [https://lightsoutapp.xyz](https://www.lightsoutapp.xyz)
+
 ---
 
 ## Stack
