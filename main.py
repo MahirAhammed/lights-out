@@ -24,10 +24,10 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.frontend_url],
+    allow_origins=[settings.frontend_url, "http://localhost:3000"],
     allow_credentials=True,
-    allow_methods=["GET", "POST"],
-    allow_headers=["Content-type"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["*"],
 )
 
 app.include_router(subscribers.router, prefix="/api/v1/subscribers", tags=["subscribers"])
