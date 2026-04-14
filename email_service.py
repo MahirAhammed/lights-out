@@ -1,6 +1,7 @@
 import resend
 from jinja2 import Environment, FileSystemLoader
 from config import settings
+from database import AsyncSessionLocal
 from models import EmailLog, Subscriber
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -28,7 +29,7 @@ async def _send_email(
             "subject": subject,
             "html": html,
         })
-        resend_id = await response.get("id")
+        resend_id = response.get("id")
 
     except Exception as e:
         status = "failed"
@@ -47,14 +48,15 @@ def _unsub_url(token: str) -> str:
     return f"{settings.api_base_url}/subscribers/unsubscribe?token={token}"
 
 # EMAILS
-async def send_verification_email(to: str, name: str, token: str, db: AsyncSession):
+async def send_verification_email(to: str, name: str, token: str):
     verification_url = f"{settings.api_base_url}/subscribers/verify?token={token}"
-    await _send_email(
-        to = to, subject="Confirm your LightsOut subscription",
-        template= "verify.html",
-        context = {"name": name, "verify_url": verification_url},
-        db = db, email_type = "verify"
-    )
+    async with AsyncSessionLocal() as db:
+        await _send_email(
+            to = to, subject="Confirm your LightsOut subscription",
+            template= "verify.html",
+            context = {"name": name, "verify_url": verification_url},
+            db = db, email_type = "verify"
+        )
 
 async def send_welcome_email(to: str, name: str, unsubscribe_token: str, db: AsyncSession):
     await _send_email(
@@ -76,7 +78,7 @@ async def send_pre_race_email(subscribers: list[Subscriber], data: dict, db: Asy
                 db=db, email_type="pre_race", race_name=race_name
             )
 
-async def send_qualifying_results(subscribers: list[Subscriber], data: dict, db: AsyncSession):
+async def send_qualifying_results_email(subscribers: list[Subscriber], data: dict, db: AsyncSession):
     race_name = data.get("race_name", f"Round {data.get('round', '')}")
     for sub in subscribers:
         if sub.pref_qualifying:
@@ -88,16 +90,28 @@ async def send_qualifying_results(subscribers: list[Subscriber], data: dict, db:
                 db=db, email_type="qualifying", race_name=race_name
             )
 
-async def send_race_results(subscribers: list[Subscriber], data: dict, db: AsyncSession):
+async def send_race_results_email(subscribers: list[Subscriber], data: dict, db: AsyncSession):
     race_name = data.get("race_name", f"Round {data.get('round', '')}")
     for sub in subscribers:
         if sub.pref_race:
             await _send_email(
                 to=sub.email,
                 subject=f"Race Results: {race_name}",
-                template="results.html",
+                template="race_results.html",
                 context={**data, "subscriber_name": sub.name, "unsubscribe_url": _unsub_url(sub.unsubscribe_token)},
                 db=db, email_type="race", race_name=race_name
+            )
+
+async def send_sprint_quali_results_email(subscribers: list[Subscriber], data, db):
+    race_name = data.get("race_name", f"Round {data.get('round', '')}")
+    for sub in subscribers:
+        if sub.pref_sprint:
+            await _send_email(
+                sub.email,
+                f"Sprint Shootout: {race_name}",
+                "qualifying.html",
+                {**data, "is_sprint": True, "subscriber_name": sub.name, "unsubscribe_url": _unsub_url(sub.unsubscribe_token)},
+                db, "sprint_quali",
             )
 
 async def send_sprint_results_email(subscribers: list[Subscriber], data: dict, db: AsyncSession):
@@ -107,8 +121,8 @@ async def send_sprint_results_email(subscribers: list[Subscriber], data: dict, d
             await _send_email(
                 sub.email,
                 f"Sprint Results: {race_name}",
-                "sprint_results.html",
-                {**data, "subscriber_name": sub.name, "unsubscribe_url": _unsub_url(sub.unsubscribe_token)},
+                "race_results.html",
+                {**data, "is_sprint": True, "subscriber_name": sub.name, "unsubscribe_url": _unsub_url(sub.unsubscribe_token)},
                 db, "sprint", race_name,
             )
 
@@ -131,7 +145,7 @@ async def send_one_time_email(to: str, email_type: str, db: AsyncSession):
                 "constructor_standings": constructor_standings,
                 "year": year,
                 "total_rounds": 24,
-                "last_round": driver_standings.get("round", "?") if driver_standings else "?"
+                "last_round": driver_standings[0].get("round", "?") if driver_standings else "?"
             },
             db=db, email_type="one_time_standings"
         )
@@ -178,12 +192,13 @@ async def send_custom_email(to_list: list[str], subject: str, html_body: str, db
         status    = "sent"
         error     = None
         try:
-            resend_id = await resend.Emails.send({
+            response = resend.Emails.send({
                 "from": settings.email_from,
                 "to": [to],
                 "subject": subject,
                 "html": html_body,
             })
+            resend_id = response.get("id")
         except Exception as e:
             status = "failed"
             error = str(e)
