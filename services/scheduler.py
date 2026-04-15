@@ -105,6 +105,9 @@ async def _send_sprint(year: int, round_number: int):
                 subs, {"results": results, "round": round_number, "year": year}, db
             )
             print(f"Sprint results sent to {len(subs)} subscribers")
+        
+    for key in ("driver_standings", "constructor_standings", "current_race_weekend"):
+        await cache_invalidate(key) # Invalidate current standings in cache
 
 
 async def _send_race(year: int, round_number: int):
