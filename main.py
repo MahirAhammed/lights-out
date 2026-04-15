@@ -1,5 +1,5 @@
 from api.v1 import subscribers
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
@@ -45,9 +45,6 @@ app.add_middleware(
 app.include_router(subscribers.router, prefix="/api/v1/subscribers", tags=["subscribers"])
 
 @app.get("/health")
-async def health(token: str = None):
-    expected_token = settings.secret_key
-    if not token or token != expected_token:
-        raise HTTPException(400, detail="Bad request")
-    
+@limiter.limit("6/hour")
+async def health():
     return {"status": "ok"}
