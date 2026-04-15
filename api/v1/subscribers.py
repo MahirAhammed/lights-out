@@ -52,7 +52,7 @@ async def subscribe(request: Request, request_type: SubscribeRequest, background
     )
     db.add(subscriber)
     await db.commit()
-    background_tasks.add_task(send_verification_email, request_type.email, request_type.name or "F1 Fan", verification_token, db)
+    background_tasks.add_task(send_verification_email, request_type.email, request_type.name or "F1 Fan", verification_token)
     return {"message": "Please check your email to verify your subscription"}
 
 @router.get("/verify")
@@ -100,7 +100,7 @@ async def unsubscribe(request: Request, token: str, db: AsyncSession = Depends(g
 
 
 @router.post("/onetime")
-@limiter.limit("5/hour")
+@limiter.limit("4/hour")
 async def one_time_email(request: Request, request_type: OneTimeEmailRequest, background_tasks: BackgroundTasks, db: AsyncSession = Depends(get_db)):
     if request_type.email_type not in ("standings", "schedule"):
         raise HTTPException(400, "Invalid email type")

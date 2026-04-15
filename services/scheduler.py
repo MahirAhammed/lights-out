@@ -127,7 +127,7 @@ async def _send_race(year: int, round_number: int):
 # THURSDAY SCHEDULE CHECKER
 async def job_thursday_check():
     print(f"Thursday check => {datetime.now(timezone.utc).strftime('%d %b %Y')}")
-    schedule = get_current_season_schedule()
+    schedule = await get_current_season_schedule()
     race = _race_week(schedule)
 
     if not race:

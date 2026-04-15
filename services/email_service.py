@@ -151,7 +151,7 @@ async def send_one_time_email(to: str, email_type: str, db: AsyncSession):
         )
 
     elif email_type == "schedule":
-        schedule = get_current_season_schedule()
+        schedule = await get_current_season_schedule()
         now = datetime.now(timezone.utc)
         next_set = False
         races = []

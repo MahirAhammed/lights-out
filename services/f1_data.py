@@ -2,7 +2,8 @@ import fastf1
 import httpx
 import asyncio
 from datetime import datetime, timezone
-from utils.constants import FLAGS, CONSTRUCTOR_COLOURS
+from utils.cache import cache_get, cache_set
+from utils.constants import FLAGS, CONSTRUCTOR_COLOURS, CACHE_TTL
 
 # fastf1.Cache.enable_cache("/tmp/fastf1_cache")
 ERGAST_BASE = "https://api.jolpi.ca/ergast/f1"
@@ -23,8 +24,13 @@ def _parse_event_sessions(event) -> dict:
     return {"sessions": sessions, "is_sprint": is_sprint}
 
 
-def get_current_season_schedule() -> list[dict]:
-    year = datetime.now().year
+async def get_current_season_schedule() -> list[dict]:
+
+    cached = await cache_get("schedule")
+    if cached is not None:
+        return cached
+
+    year = datetime.now(timezone.utc).year
     schedule = fastf1.get_event_schedule(year, include_testing=False)
     races = []
     for _, row in schedule.iterrows():
@@ -39,6 +45,8 @@ def get_current_season_schedule() -> list[dict]:
             "is_sprint": session_info["is_sprint"],
             "sessions": session_info["sessions"],
         })
+    
+    await cache_set("schedule", races, CACHE_TTL["schedule"])
     return races
 
 
@@ -114,6 +122,10 @@ def get_track_info(year: int, round_number: int) -> dict:
 
 
 async def get_driver_standings(year: int) -> list[dict]:
+    cached = await cache_get("driver_standings")
+    if cached is not None:
+        return cached
+
     try:
         async with httpx.AsyncClient() as client:
             r = await client.get(
@@ -141,12 +153,18 @@ async def get_driver_standings(year: int) -> list[dict]:
                 "points": float(entry["points"]),
                 "wins": int(entry["wins"]),
             })
+
+        await cache_set("driver_standings", result, CACHE_TTL["driver_standings"])
         return result[:10]
     except Exception:
         return []
 
 
 async def get_constructor_standings(year: int) -> list[dict]:
+    cached = await cache_get("constructor_standings")
+    if cached is not None:
+        return cached
+    
     try:
         async with httpx.AsyncClient() as client:
             r = await client.get(
@@ -167,6 +185,7 @@ async def get_constructor_standings(year: int) -> list[dict]:
                 "colour": CONSTRUCTOR_COLOURS.get(entry["Constructor"]["constructorId"], "#444"),
             })
 
+        await cache_set("constructor_standings", result, CACHE_TTL["constructor_standings"])
         return result[:11]
     except Exception:
         return []
