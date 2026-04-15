@@ -44,7 +44,7 @@ app.add_middleware(
 
 app.include_router(subscribers.router, prefix="/api/v1/subscribers", tags=["subscribers"])
 
-@app.get("/health", methods=["GET","HEAD"])
+@app.head("/health")
 @limiter.limit("6/hour")
 async def health(request: Request):
     return {"status": "ok"}
