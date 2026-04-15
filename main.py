@@ -46,5 +46,5 @@ app.include_router(subscribers.router, prefix="/api/v1/subscribers", tags=["subs
 
 @app.get("/health")
 @limiter.limit("6/hour")
-async def health():
+async def health(request: Request):
     return {"status": "ok"}
