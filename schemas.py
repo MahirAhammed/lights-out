@@ -3,7 +3,7 @@ from typing import Optional
 
 class SubscribeRequest(BaseModel):
     email: EmailStr
-    name: Optional[str] = Field(None, max_length = 50)
+    name: Optional[str] = Field(None, max_length = 50, pattern=r"^[A-Za-zÀ-ÖØ-öø-ÿ\s'-]+$")
     timezone: Optional[str] = Field("UTC", max_length=30)
     pref_pre_race: bool = True
     pref_qualifying: bool = True
