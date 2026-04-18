@@ -4,9 +4,18 @@ from config.config import settings
 from config.database import AsyncSessionLocal
 from models import EmailLog, Subscriber
 from sqlalchemy.ext.asyncio import AsyncSession
+from utils.time_utils import format_schedule_time, timezone_label
+from utils.logger import get_logger
 
+logger = get_logger("email")
 resend.api_key = settings.resend_api_key
 jinja = Environment(loader = FileSystemLoader("templates/"), autoescape = True)
+
+def _localise_sessions(sessions: list, timezone: str) -> list:
+    return [
+        {**s, "date": format_schedule_time(s["date"], timezone)}
+        for s in sessions
+    ]
 
 async def _send_email(
     to: str,
@@ -34,6 +43,8 @@ async def _send_email(
     except Exception as e:
         status = "failed"
         error = str(e)
+        logger.error("Email failed for %s (%s): %s", to, email_type, error)
+        
     finally:
         db.add(EmailLog(
             subscriber_email = to,
@@ -70,11 +81,20 @@ async def send_pre_race_email(subscribers: list[Subscriber], data: dict, db: Asy
     race_name = data["track"].get("official_name", "Next Race")
     for sub in subscribers:
         if sub.pref_pre_race:
+            local_schedule = {
+                **data["track"],
+                "sessions": _localise_sessions(data["track"]["sessions"], sub.timezone or "UTC")
+            }
             await _send_email(
                 to=sub.email,
                 subject=f"Race Weekend Preview: {race_name}",
                 template="pre_race.html",
-                context={**data, "subscriber_name": sub.name, "unsubscribe_url": _unsub_url(sub.unsubscribe_token)},
+                context={
+                    **data, 
+                    "sub_timezone": timezone_label(sub.timezone), 
+                    "track": local_schedule,
+                    "subscriber_name": sub.name, 
+                    "unsubscribe_url": _unsub_url(sub.unsubscribe_token)},
                 db=db, email_type="pre_race", race_name=race_name
             )
 
