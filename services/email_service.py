@@ -161,11 +161,11 @@ async def send_one_time_email(to: str, email_type: str, db: AsyncSession):
             to=to, subject=f"F1 {year} Championship Standings",
             template="standings.html",
             context={
-                "driver_standings": driver_standings,
+                "driver_standings": driver_standings["standings"],
                 "constructor_standings": constructor_standings,
                 "year": year,
                 "total_rounds": 24,
-                "last_round": driver_standings[0].get("round", "?") if driver_standings else "?"
+                "last_round": driver_standings["last_round"]
             },
             db=db, email_type="one_time_standings"
         )

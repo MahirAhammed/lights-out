@@ -91,7 +91,7 @@ async def _send_qualifying(year: int, round_number: int):
         subs = await _active_subscribers(db)
         if subs:
             await send_qualifying_results_email(
-                subs, {"results": results, "round": round_number, "year": year}, db
+                subs, {"results": results["results"], "race_name": results["race_name"], "round": round_number, "year": year}, db
             )
             logger.info("Qualifying results sent to %d subscribers", len(subs))
 

@@ -4,6 +4,7 @@ import asyncio
 from datetime import datetime, timezone
 from utils.cache import cache_get, cache_set
 from utils.constants import FLAGS, CONSTRUCTOR_COLOURS, CACHE_TTL
+from utils.time_utils import format_lap_time
 
 # fastf1.Cache.enable_cache("/tmp/fastf1_cache")
 ERGAST_BASE = "https://api.jolpi.ca/ergast/f1"
@@ -14,18 +15,12 @@ def _parse_event_sessions(event) -> dict:
         name = event.get(f"Session{i}", "")
         date = event.get(f"Session{i}Date", None)
         if name and str(date) != "NaT" and date is not None:
-            sessions.append({
-                "name": name,
-                "date": str(date),
-            })
-
+            sessions.append({"name": name, "date": str(date)})
     is_sprint = any("sprint" in s["name"].lower() for s in sessions)
-
     return {"sessions": sessions, "is_sprint": is_sprint}
 
 
 async def get_current_season_schedule() -> list[dict]:
-
     cached = await cache_get("schedule")
     if cached is not None:
         return cached
@@ -45,79 +40,117 @@ async def get_current_season_schedule() -> list[dict]:
             "is_sprint": session_info["is_sprint"],
             "sessions": session_info["sessions"],
         })
-    
     await cache_set("schedule", races, CACHE_TTL["schedule"])
     return races
 
 
-def get_next_race() -> dict | None:
-    year = datetime.now().year
-    schedule = fastf1.get_event_schedule(year, include_testing=False)
-    now = datetime.now(timezone.utc)
+def _get_circuit_history(location: str, current_year: int, max_years: int = 20) -> dict | None:
+    try:
+        current_event      = fastf1.get_event(current_year, location)
+        present_location = current_event["Location"]
+        present_country = current_event["Country"]
+    except Exception:
+        present_location = None
+        present_country = None
 
-    upcoming = schedule[schedule["Session5Date"] > now]
-    if upcoming.empty:
+    previous_results = [] # list of (year, session) 
+    for year in range(current_year - 1, current_year - 1 - max_years, -1):
+        try:
+            event   = fastf1.get_event(year, location)
+            is_match = (event["Location"] in present_location or present_location in event["Location"])
+           
+            if not is_match and event["Country"] != present_country :
+                continue
+
+            session = fastf1.get_session(year, event["RoundNumber"], "R")
+            session.load(laps= len(previous_results) == 0 , telemetry= False, weather= False, messages= False)
+            if not session.results.empty:
+                previous_results.append((year, session))
+                if len(previous_results) == 5:
+                    break
+        except Exception:
+            continue
+ 
+    if not previous_results:
         return None
 
-    row = upcoming.iloc[0]
-    session_info = _parse_event_sessions(row)
+    most_recent_year, race_session = previous_results[0]
+    
+    quali_session = None
+    try:
+        qs = fastf1.get_session(most_recent_year, race_session.event["RoundNumber"], "Q")
+        qs.load(laps=False, telemetry=False, weather=False, messages=False)
+        quali_session = qs if not qs.laps.empty else None
+    except Exception:
+        pass
+ 
+    pole = None
+    if quali_session:
+        try:
+            q_results = quali_session.results
+            if not q_results.empty:
+                pole_row = q_results.iloc[0]
+                pole = {
+                    "driver": pole_row["FullName"],
+                    "abbreviation": pole_row["Abbreviation"],
+                    "flag": FLAGS.get(pole_row.get("Nationality", ""), "🏳️"),
+                    "time": format_lap_time(pole_row.get("Q3")),
+                }
+        except Exception:
+            pass
+    
+    results = race_session.results
+    winner_row = results.iloc[0]
+    recent_winners = []
+    for yr, sess in previous_results:
+        if sess.results.empty:
+            continue
+        w = sess.results.iloc[0]
+        name = w["FullName"]
+        recent_winners.append({
+            "year":   yr,
+            "driver": name,
+            "team":   w["TeamName"],
+            "flag":   FLAGS.get(w.get("Nationality", ""), "🏳️"),
+        })
 
+    corners    = None
+    total_laps = None
+    try:
+        info = race_session.get_circuit_info()
+        if info is not None:
+            corners = len(info.corners)
+    except Exception:
+        pass
+    if not race_session.laps.empty:
+        total_laps = int(race_session.laps["LapNumber"].max())
+    
     return {
-        "round": int(row["RoundNumber"]),
-        "name": row["EventName"],
-        "country": row["Country"],
-        "location": row["Location"],
-        "official_name": row.get("OfficialEventName", row["EventName"]),
-        "race_date": str(row["Session5Date"]),
-        "is_sprint": session_info["is_sprint"],
-        "sessions": session_info["sessions"],
+        "year": most_recent_year,
+        "last_winner": {
+            "driver": winner_row["FullName"], 
+            "team": winner_row["TeamName"], 
+            "flag": FLAGS.get(winner_row.get("Nationality", ""), "🏳️")
+        },
+        "last_pole": pole,
+        "corners": corners,
+        "total_laps": total_laps,
+        "recent_winners": recent_winners,
     }
 
 
-def get_track_info(year: int, round_number: int) -> dict:
+async def get_track_info(year: int, round_number: int) -> dict:
     event = fastf1.get_event(year, round_number)
     session_info = _parse_event_sessions(event)
-
-    current_race = fastf1.get_session(year, round_number, 'R')
-    current_race.load(laps=True, telemetry=False, weather=False, messages=False)
-    # total_laps = current_race.total_laps
-    # Get corner count if available
-    try:
-        circuit_info = current_race.get_circuit_info()
-        corner_count = len(circuit_info.corners) if circuit_info else "N/A"
-    except Exception:
-        corner_count = "N/A"
-
-    last_winner = None
-    lookback_years = 10
-    for i in range(1, lookback_years + 1):
-        try:
-            prev_year = year - i
-            prev_race = fastf1.get_session(prev_year, round_number, 'R')
-            prev_race.load(laps=False, telemetry=False, weather=False, messages=False)
-            
-            # Check if this is the correct GP
-            if prev_race.event['EventName'] == event['EventName']:
-                winner_row = prev_race.results.iloc[0]
-                last_winner = {
-                    "driver": winner_row["FullName"],
-                    "team": winner_row["TeamName"],
-                    "year": prev_year
-                }
-                break # Exit loop once we find the most recent winner
-        except Exception:
-            continue
     return {
         "name": event["EventName"],
         "official_name": event.get("OfficialEventName", event["EventName"]),
         "country": event["Country"],
         "location": event["Location"],
         "round": int(event["RoundNumber"]),
-        # "total_laps": total_laps,
-        "corners": corner_count,
-        "last_winner": last_winner,
         "is_sprint": session_info["is_sprint"],
         "sessions": session_info["sessions"],
+        "history": _get_circuit_history(event["Location"], year)
     }
 
 
@@ -137,25 +170,28 @@ async def get_driver_standings(year: int) -> list[dict]:
             if not lists:
                 return []
             standings = lists[0]["DriverStandings"]
-        result = []
+            last_round = int(r.json()["MRData"]["StandingsTable"]["round"])
+
+        table = []
         for entry in standings:
             nationality = entry["Driver"].get("nationality", "")
-            result.append({
+            table.append({
                 "position": int(entry["position"]),
                 "driver": entry['Driver']['familyName'],
-                # "last_round": r.json()["MRData"]["StandingsTable"].get("round"),
                 "nationality": nationality,
-                "flag": FLAGS.get(nationality, "🏳️"),
                 "team_colour": CONSTRUCTOR_COLOURS.get(
                                entry["Constructors"][0]["constructorId"] if entry["Constructors"] else "", "#444"
                            ),
                 "team": entry["Constructors"][0]["name"] if entry["Constructors"] else "",
                 "points": float(entry["points"]),
-                "wins": int(entry["wins"]),
             })
 
+        result = {
+            "standings": table,
+            "last_round": last_round
+        }
         await cache_set("driver_standings", result, CACHE_TTL["driver_standings"])
-        return result[:10]
+        return result
     except Exception:
         return []
 
@@ -176,17 +212,17 @@ async def get_constructor_standings(year: int) -> list[dict]:
             if not lists:
                 return []
             standings = lists[0]["ConstructorStandings"]
-        result = []
+        table = []
         for entry in standings:
-            result.append({
+            table.append({
                 "position": int(entry["position"]),
                 "team": entry["Constructor"]["name"],
                 "points": float(entry["points"]),
                 "colour": CONSTRUCTOR_COLOURS.get(entry["Constructor"]["constructorId"], "#444"),
             })
 
-        await cache_set("constructor_standings", result, CACHE_TTL["constructor_standings"])
-        return result[:11]
+        await cache_set("constructor_standings", table, CACHE_TTL["constructor_standings"])
+        return table
     except Exception:
         return []
 
@@ -203,7 +239,7 @@ def get_race_results(year: int, round_number: int) -> list[dict]:
                 "driver": row["FullName"],
                 "abbreviation": row["Abbreviation"],
                 "team": row["TeamName"],
-                "time": str(row["Time"]),
+                "time": format_lap_time(row["Time"]),
                 "status": row["Status"],
                 "points": float(row["Points"]) if row["Points"] else 0,
             })
@@ -224,7 +260,7 @@ def get_sprint_results(year: int, round_number: int) -> list[dict]:
                 "driver": row["FullName"],
                 "abbreviation": row["Abbreviation"],
                 "team": row["TeamName"],
-                "time": str(row["Time"]),
+                "time": format_lap_time(row["Time"]),
                 "status": row["Status"],
                 "points": float(row["Points"]) if row["Points"] else 0,
             })
@@ -237,31 +273,55 @@ def get_qualifying_results(year: int, round_number: int) -> list[dict]:
     try:
         session = fastf1.get_session(year, round_number, "Qualifying")
         session.load(laps=False, telemetry=False, weather=False, messages=False)
-        results = session.results
+        results = session.results.to_dict('records')
+        pole_time = results[0].get("Q3")
         quali_results = []
-        for _, row in results.iterrows():
+
+        for row in results:
+            gap_to_pole = ""
+            if row.get("Position") > 1 and row.get("Q3") and pole_time:
+                gap = row["Q3"] - pole_time
+                gap_to_pole = f"{gap.total_seconds():.3f}"
+
             quali_results.append({
                 "position": int(row["Position"]),
                 "driver": row["FullName"],
                 "abbreviation": row["Abbreviation"],
                 "team": row["TeamName"],
-                "q1": str(row["Q1"]) if str(row["Q1"]) != "NaT" else "-",
-                "q2": str(row["Q2"]) if str(row["Q2"]) != "NaT" else "-",
-                "q3": str(row["Q3"]) if str(row["Q3"]) != "NaT" else "-",
+                "teamColor": row["TeamColor"],
+                "image": row["HeadshotUrl"],
+                "q1": format_lap_time(row["Q1"]),
+                "q2": format_lap_time(row["Q2"]),
+                "q3": format_lap_time(row["Q3"]),
+                "gap_to_pole": gap_to_pole
             })
-        return quali_results
+        return {
+            "results": quali_results, 
+            "race_name": session.event['EventName']
+        }
     except Exception:
         return []
 
 
 async def get_pre_race_package(year: int, round_number: int) -> dict:
-    track = get_track_info(year, round_number)
-    driver_standings, constructor_standings = await asyncio.gather(
+    track, driver_standings, constructor_standings = await asyncio.gather(
+        get_track_info(year, round_number),
         get_driver_standings(year),
         get_constructor_standings(year),
     )
+
+    gap = None
+    if len(driver_standings) >= 2:
+        gap = {
+            "leader":      driver_standings[0]["driver"],
+            "second":      driver_standings[1]["driver"],
+            "points_gap":  int(driver_standings[0]["points"] - driver_standings[1]["points"]),
+            "rounds_left": 24 - track["round"],
+        }
+
     return {
         "track": track,
         "driver_standings": driver_standings,
         "constructor_standings": constructor_standings,
+        "championship_gap": gap
     }
