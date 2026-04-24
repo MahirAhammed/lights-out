@@ -6,11 +6,9 @@ def format_lap_time(td) -> str:
         return "-"
     try:
         total_seconds = td.total_seconds()
-        hours = int(total_seconds // 3600)
-        total_seconds =total_seconds % 3600
         minutes  = int(total_seconds // 60)
         seconds  = total_seconds % 60
-        return f"{hours:02}:{minutes:02}:{seconds:06.3f}"
+        return f"{minutes:02}:{seconds:06.3f}"
     except Exception:
         return str(td)
 

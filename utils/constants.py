@@ -36,7 +36,7 @@ CONSTRUCTOR_COLOURS = {
     "mercedes":         "#75F1D3",
     "aston_martin":     "#229971",
     "alpine":           "#FF87BC",
-    "haas":             "#EAEAEA",
+    "haas":             "#F5F5F5",
     "rb":               "#6692FF",
     "williams":         "#005CAA",
     "audi":             "#5D615D",
