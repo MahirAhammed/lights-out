@@ -35,7 +35,7 @@
         <!-- HERO -->
         <tr>
           <td style="background:#0f0f0f;padding:36px 32px 28px;">
-            <p style="margin:0 0 12px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.22em;color:#D20C23;text-transform:uppercase;">
+            <p style="margin:0 0 12px;font-family:'Courier New',monospace;font-size:12px;letter-spacing:0.22em;color:#D20C23;text-transform:uppercase;">
               // CHAMPIONSHIP STANDINGS
             </p>
             <h1 style="margin:0 0 10px;font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:44px;line-height:0.92;letter-spacing:-0.02em;color:#f0f0f0;text-transform:uppercase;">
@@ -51,7 +51,7 @@
 
         <!-- DRIVERS -->
         <tr>
-          <td style="background:#0f0f0f;padding:28px 32px;">
+          <td style="background:#0f0f0f;padding:28px 20px;">
             <p style="margin:0 0 16px;font-family:'Courier New',monospace;font-size:15px;letter-spacing:0.2em;color:#333;text-transform:uppercase;">DRIVERS</p>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
 
@@ -77,7 +77,7 @@
                 <td style="padding:10px 8px 10px 0;vertical-align:middle;">
                   <span style="display:inline-block;width:3px;height:13px;background:{{ d.team_colour }};vertical-align:middle;margin-right:8px;"></span>
                   <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:0.03em;text-transform:uppercase;
-                    color:{% if top3 %}#e0e0e0{% else %}#555{% endif %};">
+                    color:{% if top3 %}#e0e0e0{% else %}#9f9f9f{% endif %};">
                     {{ d.driver }}
                   </span>
                 </td>
@@ -102,7 +102,7 @@
           </td>
         </tr>
 
-        <tr><td style="height:1px;background:#1a1a1a;font-size:0;line-height:0;">&nbsp;</td></tr>
+        <tr><td style="height:1px;background:#747474;font-size:0;line-height:0;">&nbsp;</td></tr>
 
         <!-- CONSTRUCTORS -->
         <tr>
@@ -130,7 +130,7 @@
                 <td style="padding:10px 8px 10px 0;vertical-align:middle;">
                   <span style="display:inline-block;width:3px;height:13px;background:{{ c.colour }};vertical-align:middle;margin-right:8px;"></span>
                   <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:0.03em;text-transform:uppercase;
-                    color:{% if top3 %}#e0e0e0{% else %}#555{% endif %};">
+                    color:{% if top3 %}#e0e0e0{% else %}#9f9f9f{% endif %};">
                     {{ c.team }}
                   </span>
                 </td>
