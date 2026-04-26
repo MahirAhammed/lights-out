@@ -1,12 +1,12 @@
 import fastf1
 import httpx
 import asyncio
+import os
 from datetime import datetime, timezone
 from utils.cache import cache_get, cache_set
 from utils.constants import FLAGS, CONSTRUCTOR_COLOURS, CACHE_TTL
 from utils.time_utils import format_lap_time
 
-# fastf1.Cache.enable_cache("/tmp/fastf1_cache")
 ERGAST_BASE = "https://api.jolpi.ca/ergast/f1"
 
 def _parse_event_sessions(event) -> dict:
@@ -80,7 +80,7 @@ def _get_circuit_history(location: str, current_year: int, max_years: int = 20) 
     try:
         qs = fastf1.get_session(most_recent_year, race_session.event["RoundNumber"], "Q")
         qs.load(laps=False, telemetry=False, weather=False, messages=False)
-        quali_session = qs if not qs.laps.empty else None
+        quali_session = qs if not qs.results.empty else None
     except Exception:
         pass
  
@@ -111,7 +111,6 @@ def _get_circuit_history(location: str, current_year: int, max_years: int = 20) 
             "year":   yr,
             "driver": name,
             "team":   w["TeamName"],
-            "flag":   FLAGS.get(w.get("Nationality", ""), "🏳️"),
         })
 
     corners    = None
@@ -234,14 +233,22 @@ def get_race_results(year: int, round_number: int) -> list[dict]:
         results = session.results
         race_results = []
         for _, row in results.iterrows():
+            gridPos = int(row["GridPosition"]) if row.get("GridPosition") else 0
+            finalPos = int(row["Position"])
             race_results.append({
-                "position": str(row["Position"]),
-                "driver": row["FullName"],
+                "position": finalPos,
+                "driver": row["BroadcastName"],
                 "abbreviation": row["Abbreviation"],
                 "team": row["TeamName"],
+                "teamColor": row.get("TeamColor", ""),
+                "image": row.get("HeadshotUrl", ""),
                 "time": format_lap_time(row["Time"]),
+                "race_time":     format_lap_time(row["Time"]) if int(row["Position"]) == 1 else None,
                 "status": row["Status"],
+                "lapped": row["Status"],
                 "points": float(row["Points"]) if row["Points"] else 0,
+                "grid_position": gridPos,
+                "pos_delta": gridPos - finalPos
             })
         return race_results
     except Exception:
@@ -255,14 +262,22 @@ def get_sprint_results(year: int, round_number: int) -> list[dict]:
         results = session.results
         sprint_results = []
         for _, row in results.iterrows():
+            gridPos = int(row["GridPosition"]) if row.get("GridPosition") else 0
+            finalPos = int(row["Position"])
             sprint_results.append({
-                "position": str(row["Position"]),
+                "position": finalPos,
                 "driver": row["FullName"],
                 "abbreviation": row["Abbreviation"],
                 "team": row["TeamName"],
+                "teamColor": row.get("TeamColor", ""),
+                "image": row.get("HeadshotUrl", ""),
                 "time": format_lap_time(row["Time"]),
+                "race_time":     format_lap_time(row["Time"]) if int(row["Position"]) == 1 else None,
                 "status": row["Status"],
+                "lapped": row["Status"],
                 "points": float(row["Points"]) if row["Points"] else 0,
+                "grid_position": gridPos,
+                "pos_delta": gridPos - finalPos
             })
         return sprint_results
     except Exception:
@@ -309,8 +324,8 @@ async def get_pre_race_package(year: int, round_number: int) -> dict:
         get_driver_standings(year),
         get_constructor_standings(year),
     )
-
     gap = None
+    driver_standings = driver_standings["standings"]
     if len(driver_standings) >= 2:
         gap = {
             "leader":      driver_standings[0]["driver"],
