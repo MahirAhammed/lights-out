@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<title>Race Weekend Preview — LightsOut</title>
+<title>Race Weekend Preview -- LightsOut</title>
 <style>
   body, table, td { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
   table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
@@ -19,7 +19,7 @@
       <table role="presentation" width="100%" style="max-width:540px;" cellpadding="0" cellspacing="0">
 
         <!-- TOP BAR -->
-        <tr><td style="height:3px;background:#E8001D;font-size:0;line-height:0;">&nbsp;</td></tr>
+        <tr><td style="height:3px;background:#d20c23;font-size:0;line-height:0;">&nbsp;</td></tr>
 
         <!-- HEADER -->
         <tr>
@@ -28,11 +28,11 @@
               <tr>
                 <td>
                   <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:22px;letter-spacing:0.15em;color:#f0f0f0;text-transform:uppercase;">
-                    LIGHTS<span style="color:#E8001D;">OUT</span>
+                    LIGHTS<span style="color:#d20c23;">OUT</span>
                   </span>
                 </td>
                 <td align="right">
-                  <span style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.16em;color:#333;text-transform:uppercase;">
+                  <span style="font-family:'Courier New',monospace;font-size:11px;letter-spacing:0.16em;color:#333;text-transform:uppercase;">
                     Round {{ track.round }} / 24
                   </span>
                 </td>
@@ -41,19 +41,24 @@
           </td>
         </tr>
 
-        <tr><td style="height:1px;background:linear-gradient(to right,#E8001D,#3a0008);font-size:0;line-height:0;">&nbsp;</td></tr>
+        <tr><td style="height:1px;background:linear-gradient(to right,#d20c23,#3a0008);font-size:0;line-height:0;">&nbsp;</td></tr>
 
         <!-- HERO -->
         <tr>
           <td style="background:#0f0f0f;padding:36px 32px 28px;">
-            <p style="margin:0 0 12px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.22em;color:#E8001D;text-transform:uppercase;">
-              // RACE WEEKEND PREVIEW{% if track.is_sprint %} · SPRINT WEEKEND{% endif %}
+            <p style="margin:0 0 12px;font-family:'Courier New',monospace;font-size:12px; font-weight:700; letter-spacing:0.22em;color:#d32035;text-transform:uppercase;">
+              // RACE WEEKEND PREVIEW
+              
             </p>
-            <h1 style="margin:0 0 8px;font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:44px;line-height:0.92;letter-spacing:-0.02em;color:#f0f0f0;text-transform:uppercase;">
-              {{ track.name | upper }}<br>
-              <span style="color:#E8001D;">GRAND PRIX.</span>
+            {% if track.is_sprint %}
+              <span style="display:inline-block;background-color:#a60a1c;color:#ffffff;padding:2px 8px;margin-left:8px;border-radius:12px;font-size:10px;vertical-align:middle;letter-spacing:0.1em;">
+                SPRINT WEEKEND
+              </span>
+              {% endif %}
+            <h1 style="margin:0 0 8px;font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:42px;line-height:0.92;letter-spacing:-0.02em;color:#f0f0f0;text-transform:uppercase;">
+              {{ track.name | upper }}
             </h1>
-            <p style="margin:12px 0 0;font-family:'Courier New',monospace;font-size:10px;color:#444;">
+            <p style="margin:12px 0 0;font-family:'Courier New',monospace;font-size:15px;color:#717070;">
               {{ track.location }}, {{ track.country }}
             </p>
           </td>
@@ -61,45 +66,60 @@
 
         <tr><td style="height:1px;background:#1a1a1a;font-size:0;line-height:0;">&nbsp;</td></tr>
 
+        <!-- CIRCUIT QUICK STATS -->
+        {% if track.history %}
         <tr>
-          <td style="background:#0f0f0f;padding:16px 32px;text-align:center;">
-            <div style="display:inline-block; width:100%; max-width:140px; vertical-align:top; text-align:left; margin-bottom:12px;">
-              <p style="margin:0 0 4px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.18em;color:#333;text-transform:uppercase;">Distance</p>
-              <p style="margin:0;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:16px;color:#888;text-transform:uppercase;">
-                {{ track.total_laps }} <span style="font-size:10px;color:#444;">Laps</span>
-              </p>
-            </div>
-            <div style="display:inline-block; width:100%; max-width:140px; vertical-align:top; text-align:left; margin-bottom:12px;">
-              <p style="margin:0 0 4px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.18em;color:#333;text-transform:uppercase;">Corners</p>
-              <p style="margin:0;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:16px;color:#888;text-transform:uppercase;">
-                {{ track.corners }}
-              </p>
-            </div>
-            <div style="display:inline-block; width:100%; max-width:140px; vertical-align:top; text-align:left; margin-bottom:12px;">
-              <p style="margin:0 0 4px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.18em;color:#333;text-transform:uppercase;">Format</p>
-              <p style="margin:0;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:16px;color:{% if track.format == 'sprint' %}#E8001D{% else %}#888{% endif %};text-transform:uppercase;">
-                {{ track.format }}
-              </p>
-            </div>
-            </td>
+          <td style="background:#0f0f0f;padding:16px 32px 20px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="table-layout: fixed;">
+              <tr>
+                
+                {% if track.history.corners %}
+                <td style="vertical-align:top; width:50%; background:#262626; border:2px solid #d20c23; border-radius:4px; padding:12px 14px;">
+                  <p style="margin:0 0 5px;font-family:'Courier New',monospace;font-size:12px;color:#838383;text-transform:uppercase;letter-spacing:0.18em;">Corners</p>
+                  <p style="margin:0;font-family:'Arial Narrow',Arial,sans-serif;letter-spacing:0.25em;font-weight:700;font-size:26px;color:#d1d1d1;">
+                    {{ track.history.corners }}
+                  </p>
+                </td>
+                {% endif %}
+
+                {% if track.history.corners and track.history.total_laps %}
+                <td width="16" style="font-size:0;line-height:0;">&nbsp;</td>
+                {% endif %}
+
+                {% if track.history.total_laps %}
+                <td style="vertical-align:top; width:50%; background:#262626; border:2px solid #d20c23; border-radius:4px; padding:12px 14px;">
+                  <p style="margin:0 0 5px;font-family:'Courier New',monospace;font-size:12px;letter-spacing:0.18em;color:#838383;text-transform:uppercase;">Race Laps</p>
+                  <p style="margin:0;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:28px;color:#d1d1d1;letter-spacing: 0.25em;">
+                    {{ track.history.total_laps }}
+                  </p>
+                </td>
+                {% endif %}
+
+              </tr>
+            </table>
+          </td>
         </tr>
+        {% endif %}
 
         <tr><td style="height:1px;background:#1a1a1a;font-size:0;line-height:0;">&nbsp;</td></tr>
 
         <!-- SESSION SCHEDULE -->
         <tr>
           <td style="background:#0f0f0f;padding:24px 32px;">
-            <p style="margin:0 0 14px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.2em;color:#333;text-transform:uppercase;">SESSION SCHEDULE</p>
+            <p style="margin:0 0 4px;font-family:'Courier New',monospace;font-size:16px;letter-spacing:0.1em;color:#5a5a5a;text-transform:uppercase;">WEEKEND SCHEDULE</p>
+            <p style="margin:0 0 14px;font-family:'Courier New',monospace;font-size:12px;color:#585656;letter-spacing:0.1em;">
+              All times in {{ sub_timezone }}
+            </p>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
               {% for s in track.sessions %}
               {% set is_race = 'race' in s.name | lower and 'sprint' not in s.name | lower %}
               <tr style="border-bottom:1px solid #141414;">
-                <td style="padding:9px 0;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;
-                  color:{% if is_race %}#E8001D{% else %}#444{% endif %};">
+                <td style="padding:5px 0;font-family:'Courier New',monospace;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;
+                  color:{% if is_race %}#fff{% else %}#717070{% endif %};">
                   {{ s.name }}
                 </td>
-                <td align="right" style="padding:9px 0;font-family:'Courier New',monospace;font-size:10px;
-                  color:{% if is_race %}#888{% else %}#2e2e2e{% endif %};">
+                <td align="right" style="padding:9px 0;font-family:'Courier New',monospace;font-size:11px;
+                  color:{% if is_race %}#888{% else %}#656464{% endif %};">
                   {{ s.date }}
                 </td>
               </tr>
@@ -110,40 +130,128 @@
 
         <tr><td style="height:1px;background:#1a1a1a;font-size:0;line-height:0;">&nbsp;</td></tr>
 
-        <!-- CIRCUIT NOTES -->
-        {% if track.lap_record or track.last_winner %}
+        <!-- CIRCUIT HISTORY -->
         <tr>
           <td style="background:#0d0d0d;padding:24px 32px;">
-            <p style="margin:0 0 14px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.2em;color:#333;text-transform:uppercase;">CIRCUIT NOTES</p>
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-              {% if track.last_winner %}
-              <tr style="border-bottom:1px solid #141414;">
-                <td style="padding:9px 0;font-family:'Courier New',monospace;font-size:10px;color:#333;text-transform:uppercase;letter-spacing:0.08em;">
-                  Last winner
+            <p style="margin:0 0 16px;font-family:'Courier New',monospace;font-size:12px;letter-spacing:0.2em;color:#5a5a5a;text-transform:uppercase;">
+              CIRCUIT HISTORY
+            </p>
+ 
+            {% if track.history %}
+ 
+            <!-- Last winner + pole sitter cards -->
+            {% if track.history.last_winner or track.history.last_pole %}
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px;">
+              <tr>
+ 
+                {% if track.history.last_winner %}
+                <td style="padding:0 4px 0 0;vertical-align:top;width:50%;">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td style="background:#313131;border:1px solid #1e1e1e;padding:12px 14px;border-radius:4px;">
+                        <p style="margin:0 0 6px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.16em;color:#5a5a5a;text-transform:uppercase;">Last Winner</p>
+                        <p style="margin:0 0 3px;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:14px;letter-spacing:0.04em;text-transform:uppercase;color:#afafaf;line-height:1.2;">
+                          {{ track.history.last_winner.driver }}
+                        </p>
+                        <p style="margin:0;font-family:'Courier New',monospace;font-size:10px;color:#2e2e2e;">
+                          {{ track.history.last_winner.team }}
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
                 </td>
-                <td align="right" style="padding:9px 0;">
-                  <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:0.03em;text-transform:uppercase;color:#888;">
-                    {{ track.last_winner.driver }}
-                  </span>
-                  <span style="font-family:'Courier New',monospace;font-size:9px;color:#2e2e2e;margin-left:6px;">
-                    {{ track.last_winner.year }}
-                  </span>
+                {% endif %}
+ 
+                {% if track.history.last_pole %}
+                <td style="padding:0 0 0 4px;vertical-align:top;width:50%;">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td style="background:#313131;border:1px solid #1e1e1e;padding:12px 14px;border-radius:4px;">
+                        <p style="margin:0 0 6px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.16em;color:#3a3a3a;text-transform:uppercase;">Last Pole</p>
+                        <p style="margin:0 0 3px;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:14px;letter-spacing:0.04em;text-transform:uppercase;color:#888;line-height:1.2;">
+                          {{ track.history.last_pole.driver }}
+                        </p>
+                        <p style="margin:0;font-family:'Courier New',monospace;font-size:10px;color:#2e2e2e;">
+                          {{ track.history.last_pole.time }}
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+                {% endif %}
+ 
+              </tr>
+            </table>
+            {% endif %}
+ 
+            <!-- Recent winners - full-width card -->
+            {% if track.history.recent_winners and track.history.recent_winners | length > 0 %}
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="background:#141414;border:1px solid #1e1e1e;padding:12px 14px;border-radius:4px;">
+                  <p style="margin:0 0 10px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.16em;color:#3a3a3a;text-transform:uppercase;">Recent Winners</p>
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                    {% for w in track.history.recent_winners %}
+                    <tr {% if not loop.last %}style="border-bottom:1px solid #1c1c1c;"{% endif %}>
+                      <td style="padding:6px 0;font-family:'Courier New',monospace;font-size:10px;color:#2e2e2e;width:36px;">
+                        {{ w.year }}
+                      </td>
+                      <td style="padding:6px 0;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:0.03em;text-transform:uppercase;color:#666;">
+                        {{ w.image }} {{ w.driver }}
+                      </td>
+                      <td align="right" style="padding:6px 0;">
+                        <span style="font-family:'Courier New',monospace;font-size:10px;color:#c9c9c9;background:#1a1a1a;border:1px solid #222;padding:2px 6px;border-radius:10px;white-space:nowrap;">
+                          {{ w.team }}
+                        </span>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </table>
                 </td>
               </tr>
-              {% endif %}
-            
+            </table>
+            {% endif %}
+ 
+            {% else %}
+            <p style="margin:0;font-family:'Courier New',monospace;font-size:11px;color:#222;letter-spacing:0.08em;text-transform:uppercase;">
+              No past race data available for this circuit
+            </p>
+            {% endif %}
+          </td>
+        </tr>
+
+        <tr><td style="height:1px;background:#1a1a1a;font-size:0;line-height:0;">&nbsp;</td></tr>
+
+        <!-- CHAMPIONSHIP GAP -->
+        {% if championship_gap %}
+        <tr>
+          <td style="background:#0f0f0f;padding:18px 32px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="border-left:2px solid #d20c23;padding-left:14px;">
+                  <p style="margin:0 0 3px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.18em;color:#2e2e2e;text-transform:uppercase;">
+                    Drivers championship gap
+                  </p>
+                  <p style="margin:0;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:15px;letter-spacing:0.03em;text-transform:uppercase;color:#888;">
+                    {{ championship_gap.leader }}
+                    <span style="color:#d20c23;"> +{{ championship_gap.points_gap }}pts </span>
+                    over {{ championship_gap.second }}
+                    <span style="font-family:'Courier New',monospace;font-size:9px;color:#2e2e2e;font-weight:400;">
+                      · {{ championship_gap.rounds_left }} rounds left
+                    </span>
+                  </p>
+                </td>
+              </tr>
             </table>
           </td>
         </tr>
         <tr><td style="height:1px;background:#1a1a1a;font-size:0;line-height:0;">&nbsp;</td></tr>
         {% endif %}
 
-        
-
         <!-- DRIVER STANDINGS -->
         <tr>
           <td style="background:#0f0f0f;padding:24px 32px;">
-            <p style="margin:0 0 14px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.2em;color:#333;text-transform:uppercase;">DRIVERS · TOP 5</p>
+            <p style="margin:0 0 14px;font-family:'Courier New',monospace;font-size:12px;letter-spacing:0.2em;color:#717070;text-transform:uppercase;">DRIVERS · TOP 5</p>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
               {% for d in driver_standings[:5] %}
               <tr style="border-bottom:1px solid #141414;">
@@ -177,7 +285,7 @@
         <!-- CONSTRUCTOR STANDINGS -->
         <tr>
           <td style="background:#0d0d0d;padding:24px 32px;">
-            <p style="margin:0 0 14px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.2em;color:#333;text-transform:uppercase;">CONSTRUCTORS · TOP 5</p>
+            <p style="margin:0 0 14px;font-family:'Courier New',monospace;font-size:12px;letter-spacing:0.2em;color:#717070;text-transform:uppercase;">CONSTRUCTORS · TOP 5</p>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
               {% for c in constructor_standings[:5] %}
               <tr style="border-bottom:1px solid #141414;border-left:3px solid {{ c.colour }};">
@@ -188,6 +296,7 @@
                   </span>
                 </td>
                 <td style="padding:9px 8px 9px 0;">
+                  <span style="display:inline-block;width:3px;height:12px;background:{{ c.colour }};vertical-align:middle;margin-right:7px;"></span>
                   <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:0.03em;text-transform:uppercase;
                     color:{% if loop.index <= 3 %}#e0e0e0{% else %}#555{% endif %};">
                     {{ c.team }}
@@ -214,8 +323,8 @@
               <tr>
                 <td>
                   <p style="margin:0;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.12em;color:#282828;text-transform:uppercase;line-height:1.8;">
-                    You subscribed at lightsout.vercel.app<br>
-                    <a href="{{ unsubscribe_url }}" style="color:#282828;text-decoration:none;">Unsubscribe</a>
+                    You subscribed at LightsOut<br>
+                    <a href="{{ unsubscribe_url }}" style="color:#2391aa;text-decoration:none;">Unsubscribe</a>
                   </p>
                 </td>
                 <td align="right" valign="bottom">
