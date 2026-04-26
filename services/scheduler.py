@@ -4,6 +4,7 @@ from apscheduler.triggers.date import DateTrigger
 from datetime import datetime, timezone, timedelta
 from sqlalchemy import select
 from utils.logger import get_logger
+import os
 
 logger = get_logger("scheduler")
 
@@ -24,6 +25,7 @@ from utils.cache import cache_invalidate
 from config.database import AsyncSessionLocal
 from models import Subscriber
 from utils.constants import SESSION_RESULT_OFFSET
+import shutil, os
 
 scheduler = AsyncIOScheduler(timezone="UTC")
 
@@ -98,30 +100,34 @@ async def _send_qualifying(year: int, round_number: int):
 
 async def _send_sprint(year: int, round_number: int):
     results = get_sprint_results(year, round_number)
-    if not results:
+    if results:
+        async with AsyncSessionLocal() as db:
+            subs = await _active_subscribers(db)
+            if subs:
+                await send_sprint_results_email(
+                    subs, {"results": results, "round": round_number, "year": year}, db
+                )
+                logger.info("Sprint results sent to %d subscribers", len(subs))
+    else:
         logger.warning("Sprint outcome: no results yet for round %d", round_number)
-        return
-    async with AsyncSessionLocal() as db:
-        subs = await _active_subscribers(db)
-        if subs:
-            await send_sprint_results_email(
-                subs, {"results": results, "round": round_number, "year": year}, db
-            )
-            logger.info("Sprint results sent to %d subscribers", len(subs))
+
+    for key in ("driver_standings", "constructor_standings"):
+        await cache_invalidate(key)
+    logger.info("Standings cache invalidated after sprint round %d", round_number)
 
 
 async def _send_race(year: int, round_number: int):
     results = get_race_results(year, round_number)
-    if not results:
+    if results:
+        async with AsyncSessionLocal() as db:
+            subs = await _active_subscribers(db)
+            if subs:
+                await send_race_results_email(
+                    subs, {"results": results, "round": round_number, "year": year}, db
+                )
+                logger.info("Race results sent to %d subscribers", len(subs))
+    else:
         logger.warning("Race outcome: no results yet for round %d", round_number)
-        return
-    async with AsyncSessionLocal() as db:
-        subs = await _active_subscribers(db)
-        if subs:
-            await send_race_results_email(
-                subs, {"results": results, "round": round_number, "year": year}, db
-            )
-            logger.info("Race results sent to %d subscribers", len(subs))
     
     for key in ("driver_standings", "constructor_standings", "current_race_weekend"):
         await cache_invalidate(key) # Invalidate current standings in cache
@@ -131,6 +137,7 @@ async def _send_race(year: int, round_number: int):
 
 # THURSDAY SCHEDULE CHECKER
 async def job_thursday_check():
+    _clear_fastf1_cache()
     schedule = await get_current_season_schedule()
     race = _race_week(schedule)
     if not race:
@@ -217,6 +224,16 @@ def _schedule_weekend_jobs(race: dict, year: int) -> list[tuple]:
         jobs.append((_send_race, "Race", _send_at(race_start, "Race"), f"race_{round_number}"))
 
     return jobs
+
+
+def _clear_fastf1_cache(path: str = "/tmp/fastf1_cache"):
+    try:
+        if os.path.exists(path):
+            shutil.rmtree(path)
+            os.makedirs(path, exist_ok=True)
+            logger.info("FastF1 cache cleared at %s", path)
+    except Exception as e:
+        logger.warning("Failed to clear FastF1 cache: %s", e)
 
 
 def start_scheduler():

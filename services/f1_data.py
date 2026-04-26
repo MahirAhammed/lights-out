@@ -7,6 +7,11 @@ from utils.cache import cache_get, cache_set
 from utils.constants import FLAGS, CONSTRUCTOR_COLOURS, CACHE_TTL
 from utils.time_utils import format_lap_time
 
+cache_dir = "/tmp/fastf1"
+if not os.path.exists(cache_dir):
+    os.makedirs(cache_dir)
+fastf1.Cache.enable_cache(cache_dir)
+
 ERGAST_BASE = "https://api.jolpi.ca/ergast/f1"
 
 def _parse_event_sessions(event) -> dict:
