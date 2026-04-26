@@ -44,6 +44,8 @@ main.py               # FastAPI entry point & app initialization
 └── utils/                  # Shared utility functions
     ├── __init__.py
     ├── cache.py            # Custom caching logic
+    ├── logger.py           # Global logger
+    ├── time_utils.py       # Helpers for formatting times and timezones
     └── constants.py        # F1-specific constants (Flags, offsets)
 ├── requirements.txt            # Project dependencies
 ├── README.md                   # Project documentation
@@ -88,7 +90,7 @@ API docs at `http://localhost:8000/docs`.
 |---|---|
 | Verification | On subscribe |
 | Welcome | On email verification |
-| Pre-race preview | Thursday 08:00 UTC on race weeks |
+| Pre-race preview | Thursday 17:00 UTC on race weeks |
 | Qualifying results | 2 hours after qualifying start |
 | Sprint results | 2 hours after sprint start |
 | Race results | 3 hours after race start |
