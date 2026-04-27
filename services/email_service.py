@@ -111,6 +111,7 @@ async def send_qualifying_results_email(subscribers: list[Subscriber], data: dic
             )
 
 async def send_race_results_email(subscribers: list[Subscriber], data: dict, db: AsyncSession):
+    data = data.get("data", data)
     race_name = data.get("race_name", f"Round {data.get('round', '')}")
     for sub in subscribers:
         if sub.pref_race:
@@ -135,6 +136,7 @@ async def send_sprint_quali_results_email(subscribers: list[Subscriber], data, d
             )
 
 async def send_sprint_results_email(subscribers: list[Subscriber], data: dict, db: AsyncSession):
+    data = data.get("data", data)
     race_name = data.get("race_name", f"Round {data.get('round', '')}")
     for sub in subscribers:
         if sub.pref_sprint:

@@ -12,6 +12,7 @@ from services.f1_data import (
     get_current_season_schedule,
     get_pre_race_package,
     get_qualifying_results,
+    get_race_results_package,
     get_sprint_results,
     get_race_results,
 )
@@ -99,41 +100,40 @@ async def _send_qualifying(year: int, round_number: int):
 
 
 async def _send_sprint(year: int, round_number: int):
-    results = get_sprint_results(year, round_number)
-    if results:
+    for key in ("driver_standings", "constructor_standings"):
+        await cache_invalidate(key)
+    logger.info("Standings cache invalidated after sprint round %d", round_number)
+
+    data = await get_race_results_package(year, round_number, is_sprint=True)
+    if data.get("results"):
         async with AsyncSessionLocal() as db:
             subs = await _active_subscribers(db)
             if subs:
                 await send_sprint_results_email(
-                    subs, {"results": results, "round": round_number, "year": year}, db
+                    subs, {"data": data, "round": round_number, "year": year}, db
                 )
                 logger.info("Sprint results sent to %d subscribers", len(subs))
     else:
         logger.warning("Sprint outcome: no results yet for round %d", round_number)
 
-    for key in ("driver_standings", "constructor_standings"):
-        await cache_invalidate(key)
-    logger.info("Standings cache invalidated after sprint round %d", round_number)
-
 
 async def _send_race(year: int, round_number: int):
-    results = get_race_results(year, round_number)
-    if results:
+    for key in ("driver_standings", "constructor_standings", "current_race_weekend"):
+        await cache_invalidate(key) # Invalidate current standings in cache
+    logger.info("Standings cache invalidated after race round %d", round_number)
+
+    data = await get_race_results_package(year, round_number, is_sprint=False)
+    if data.get("results"):
         async with AsyncSessionLocal() as db:
             subs = await _active_subscribers(db)
             if subs:
                 await send_race_results_email(
-                    subs, {"results": results, "round": round_number, "year": year}, db
+                    subs, {"data": data, "round": round_number, "year": year}, db
                 )
                 logger.info("Race results sent to %d subscribers", len(subs))
     else:
         logger.warning("Race outcome: no results yet for round %d", round_number)
     
-    for key in ("driver_standings", "constructor_standings", "current_race_weekend"):
-        await cache_invalidate(key) # Invalidate current standings in cache
-
-    logger.info("Standings cache invalidated after race round %d", round_number)
-
 
 # THURSDAY SCHEDULE CHECKER
 async def job_thursday_check():
