@@ -6,11 +6,24 @@ def format_lap_time(td) -> str:
         return "-"
     try:
         total_seconds = td.total_seconds()
-        minutes  = int(total_seconds // 60)
+        hours = int(total_seconds // 3600)
+        minutes  = int(total_seconds % 3600) // 60
         seconds  = total_seconds % 60
-        return f"{minutes:02}:{seconds:06.3f}"
+        return f"{hours}:{minutes:02}:{seconds:06.3f}" if hours > 0 else f"{minutes:02}:{seconds:06.3f}"
     except Exception:
         return str(td)
+
+def format_gap_time(td) -> str | None:
+    if td is None or str(td) in ("NaT", "nan", "None", "-"):
+        return None
+    try:
+        total_seconds = td.total_seconds()
+        if total_seconds <= 0:
+            return None
+        return f"{total_seconds:.3f}s"
+    except Exception:
+        return None
+
 
 
 def format_schedule_time(dt_str: str, timezone: str = "UTC") -> str:
