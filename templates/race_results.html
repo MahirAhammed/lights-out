@@ -4,36 +4,49 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<title>Race Results — LightsOut</title>
+<title>{% if is_sprint %}Sprint Results{% else %}Race Results{% endif %} — LightsOut</title>
 <style>
   body, table, td { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
   table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
   body { margin: 0; padding: 0; background-color: #0a0a0a; }
+  @media only screen and (max-width: 480px) {
+    .outer-pad { padding: 16px 6px !important; }
+    .inner-pad { padding: 18px 16px !important; }
+    .hero-name { font-size: 32px !important; }
+    .winner-card { padding: 18px 16px !important; }
+    .headshot { width: 70px !important; height: 70px !important; }
+    .headshot-sm { width: 36px !important; height: 36px !important; }
+    .winner-time { font-size: 18px !important; }
+    .col-time { font-size: 10px !important; }
+    .col-pts { font-size: 9px !important; }
+    .delta-cell { display: none !important; }
+  }
 </style>
 </head>
 <body style="margin:0;padding:0;background-color:#0a0a0a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
 
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0a0a0a;">
   <tr>
-    <td align="center" style="padding:32px 12px;">
+    <td align="center" class="outer-pad" style="padding:32px 12px;">
       <table role="presentation" width="100%" style="max-width:540px;" cellpadding="0" cellspacing="0">
 
         <!-- TOP BAR -->
-        <tr><td style="height:3px;background:#E8001D;font-size:0;line-height:0;">&nbsp;</td></tr>
+        <tr><td style="height:3px;background:#d20c23;font-size:0;line-height:0;">&nbsp;</td></tr>
 
         <!-- HEADER -->
         <tr>
-          <td style="background:#111;padding:24px 32px;">
+          <td style="background:#111;padding:20px 28px;" class="inner-pad">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
               <tr>
                 <td>
                   <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:22px;letter-spacing:0.15em;color:#f0f0f0;text-transform:uppercase;">
-                    LIGHTS<span style="color:#E8001D;">OUT</span>
+                    LIGHTS<span style="color:#d20c23;">OUT</span>
                   </span>
                 </td>
                 <td align="right">
-                  <span style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.16em;color:#333;text-transform:uppercase;">
-                    {% if is_sprint %}SPRINT{% else %}RACE{% endif %} · Round {{ round }}
+                  <span style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.14em;color:#333;text-transform:uppercase;">
+                    {% if is_sprint %}SPRINT{% else %}RACE{% endif %}
+                    &nbsp;·&nbsp;Round {{ round }}
                   </span>
                 </td>
               </tr>
@@ -41,138 +54,406 @@
           </td>
         </tr>
 
-        <tr><td style="height:1px;background:linear-gradient(to right,#E8001D,#3a0008);font-size:0;line-height:0;">&nbsp;</td></tr>
+        <tr><td style="height:1px;background:linear-gradient(to right,#d20c23,#3a0008);font-size:0;line-height:0;">&nbsp;</td></tr>
 
         <!-- HERO -->
         <tr>
-          <td style="background:#0f0f0f;padding:36px 32px 28px;">
-            <p style="margin:0 0 12px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.22em;color:#E8001D;text-transform:uppercase;">
-              // {% if is_sprint %}SPRINT RESULTS{% else %}RACE RESULTS{% endif %}
+          <td style="background:#0f0f0f;padding:32px 28px 24px;" class="inner-pad">
+            <p style="margin:0 0 10px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.22em;color:#d20c23;text-transform:uppercase;">
+              // {% if is_sprint %}SPRINT RACE RESULTS{% else %}RACE RESULTS{% endif %}
             </p>
-            <h1 style="margin:0 0 8px;font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:44px;line-height:0.92;letter-spacing:-0.02em;color:#f0f0f0;text-transform:uppercase;">
+            <h1 class="hero-name" style="margin:0 0 8px;font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:40px;line-height:0.92;letter-spacing:-0.02em;color:#f0f0f0;text-transform:uppercase;">
               {{ race_name | upper }}<br>
-              <span style="color:#E8001D;">{% if is_sprint %}SPRINT.{% else %}CLASSIFIED.{% endif %}</span>
+              <span style="color:#d20c23;">CHEQUERED FLAG.</span>
             </h1>
             <p style="margin:10px 0 0;font-family:'Courier New',monospace;font-size:10px;color:#444;">
-              {{ year }} season · Round {{ round }}
+              {{ year }} season &nbsp;·&nbsp; Round {{ round }}
+              {% if total_laps %}&nbsp;·&nbsp; {{ total_laps }} laps{% endif %}
             </p>
           </td>
         </tr>
 
         <tr><td style="height:1px;background:#1a1a1a;font-size:0;line-height:0;">&nbsp;</td></tr>
 
-        <!-- PODIUM -->
-        {% if results %}
+        <!-- WINNER CARD -->
+        {% if results and results|length > 0 %}
+        {% set winner = results[0] %}
         <tr>
-          <td style="background:#0d0d0d;padding:24px 32px;">
-            <p style="margin:0 0 14px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.2em;color:#333;text-transform:uppercase;">PODIUM</p>
+          <td class="winner-card" style="background:#0d0d0d;padding:22px 28px;">
+            <p style="margin:0 0 14px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.2em;color:#333;text-transform:uppercase;">
+              {% if is_sprint %}SPRINT WINNER{% else %}RACE WINNER{% endif %}
+            </p>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-
-              {% for r in results[:3] %}
-              {% set colours = ['#C9A84C', '#9E9E9E', '#8B5A2B'] %}
-              {% set colour = colours[loop.index0] %}
-              <tr style="border-bottom:1px solid #141414;border-left:3px solid {{ colour }};">
-                <td width="36" style="padding:14px 0 14px 12px;vertical-align:middle;">
-                  <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:20px;color:{{ colour }};">
-                    P{{ loop.index }}
-                  </span>
-                </td>
-                <td style="padding:14px 8px;vertical-align:middle;">
-                  <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:15px;letter-spacing:0.03em;text-transform:uppercase;color:#e0e0e0;display:block;">
-                    {{ r.driver }}
-                  </span>
-                  <span style="font-family:'Courier New',monospace;font-size:9px;color:#444;">
-                    {{ r.team }}
-                  </span>
-                </td>
-                <td align="right" style="padding:14px 4px;vertical-align:middle;white-space:nowrap;">
-                  <span style="font-family:'Courier New',monospace;font-size:10px;color:#333;display:block;">
-                    {% if loop.index == 1 %}{{ r.time }}{% else %}+{{ r.time }}{% endif %}
-                  </span>
-                  {% if r.points > 0 %}
-                  <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:12px;color:{{ colour }};">
-                    +{{ r.points | int }} pts
-                  </span>
+              <tr>
+                <td width="90" valign="bottom" style="padding-right:16px;">
+                  {% if winner.image %}
+                  <img class="headshot" src="{{ winner.image }}" width="90" height="90" alt="{{ winner.driver }}"
+                    style="display:block;width:90px;height:90px;object-fit:cover;object-position:top;border-radius:50%;
+                           border:3px solid #{{ winner.teamColor if winner.teamColor else 'd20c23' }};">
+                  {% else %}
+                  <div class="headshot" style="width:90px;height:90px;background:#1a1a1a;border-radius:4px;
+                       border-bottom:3px solid #{{ winner.teamColor if winner.teamColor else 'd20c23' }};"></div>
                   {% endif %}
                 </td>
+                <td valign="middle">
+                  <p style="margin:0 0 2px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.14em;color:#555;text-transform:uppercase;">
+                    P1 &nbsp;·&nbsp; {{ winner.team }}
+                  </p>
+                  <p style="margin:0 0 4px;font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:22px;letter-spacing:0.02em;text-transform:uppercase;color:#f0f0f0;">
+                    {{ winner.driver }}
+                  </p>
+                  {% if winner.race_time %}
+                  <p class="winner-time" style="margin:0 0 6px;font-family:'Courier New',monospace;font-weight:700;font-size:20px;color:#aeaa59;letter-spacing:0.04em;">
+                    {{ winner.race_time }}
+                  </p>
+                  {% endif %}
+                  <p style="margin:0;font-family:'Courier New',monospace;font-size:11px;letter-spacing:0.1em;color:#ececec;text-transform:uppercase;">
+                    +{{ winner.points | int }} pts
+                  </p>
+                </td>
               </tr>
-              {% endfor %}
-
             </table>
           </td>
         </tr>
-
         <tr><td style="height:1px;background:#1a1a1a;font-size:0;line-height:0;">&nbsp;</td></tr>
+        {% endif %}
 
-        <!-- FULL CLASSIFICATION -->
+        <!-- PODIUM ROW (P2 + P3) -->
+        {% if results and results|length >= 3 %}
+        {% set p2 = results[1] %}
+        {% set p3 = results[2] %}
         <tr>
-          <td style="background:#0f0f0f;padding:24px 32px;">
-            <p style="margin:0 0 14px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.2em;color:#333;text-transform:uppercase;">FULL CLASSIFICATION</p>
+          <td style="background:#0f0f0f;padding:16px 28px 20px;" class="inner-pad">
+            <p style="margin:0 0 12px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.18em;color:#2a2a2a;text-transform:uppercase;">PODIUM</p>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="table-layout:fixed;">
+              <tr>
+                <!-- P2 -->
+                <td style="vertical-align:top;width:50%;padding-right:6px;">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td style="background:#111;border:1px solid #1e1e1e;border-top:2px solid #9E9E9E;padding:10px 12px;border-radius:3px;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                          <tr>
+                            <td align="left">
+                              <p style="margin:0 0 6px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.14em;color:#444;text-transform:uppercase;">P2</p>
+                            </td>
+                            <td align="right">
+                              <p style="margin:0 0 6px;font-family:'Courier New',monospace;font-size:9px;color:#ececec;font-weight:bold;">+{{ p2.points | int }} PTS</p>
+                            </td>
+                          </tr>
+                        </table>
+                        <!-- <p style="margin:0 0 6px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.14em;color:#444;text-transform:uppercase;">P2</p> -->
+                        {% if p2.image %}
+                        <img class="headshot-sm" src="{{ p2.image }}" width="40" height="40" alt="{{ p2.driver }}"
+                          style="display:block;width:40px;height:40px;object-fit:cover;object-position:top;border-radius:50%;margin-bottom:8px;
+                          border:2px solid #{{ p2.teamColor if p2.teamColor else 'd20c23' }}">
+                        {% endif %}
+                        <p style="margin:0 0 2px;font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:14px;letter-spacing:0.04em;text-transform:uppercase;color:#f0f0f0;">
+                          {{ p2.driver }}
+                        </p>
+                        <p style="margin:0;font-family:'Courier New',monospace;font-size:10px;color:#737373;text-transform:uppercase;">
+                          {{ p2.team | truncate(16, true, '') }}
+                        </p>
+                        {% if p2.time %}
+                        <p style="margin:5px 0 0;font-family:'Courier New',monospace;font-size:9px;color:#444;letter-spacing:0.04em;">+{{ p2.time }}</p>
+                        {% endif %}
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+                <!-- P3 -->
+                <td style="vertical-align:top;width:50%;padding-left:6px;">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td style="background:#111;border:1px solid #1e1e1e;border-top:2px solid #8B5A2B;padding:10px 12px;border-radius:3px;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                          <tr>
+                            <td align="left">
+                              <p style="margin:0 0 6px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.14em;color:#444;text-transform:uppercase;">P3</p>
+                            </td>
+                            <td align="right">
+                              <p style="margin:0 0 6px;font-family:'Courier New',monospace;font-size:9px;color:#ececec;font-weight:bold;">+{{ p3.points | int }} PTS</p>
+                            </td>
+                          </tr>
+                        </table>
+                        <!-- <p style="margin:0 0 6px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.14em;color:#444;text-transform:uppercase;">P3</p> -->
+                        {% if p3.image %}
+                        <img class="headshot-sm" src="{{ p3.image }}" width="40" height="40" alt="{{ p3.driver }}"
+                          style="display:block;width:40px;height:40px;object-fit:cover;object-position:top;border-radius:50%;margin-bottom:8px;
+                          border:2px solid #{{ p3.teamColor if p3.teamColor else 'd20c23' }}">
+                        {% endif %}
+                        <p style="margin:0 0 2px;font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:14px;letter-spacing:0.04em;text-transform:uppercase;color:#f0f0f0;">
+                          {{ p3.driver }}
+                        </p>
+                        <p style="margin:0;font-family:'Courier New',monospace;font-size:10px;color:#737373;text-transform:uppercase;">
+                          {{ p3.team | truncate(16, true, '') }}
+                        </p>
+                        {% if p3.time %}
+                        <p style="margin:5px 0 0;font-family:'Courier New',monospace;font-size:9px;color:#444;letter-spacing:0.04em;">+{{ p3.time }}</p>
+                        {% endif %}
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr><td style="height:1px;background:#1a1a1a;font-size:0;line-height:0;">&nbsp;</td></tr>
+        {% endif %}
+
+        <!-- FULL RESULTS TABLE (P4 onwards) -->
+        {% set rest = results[3:] if results|length > 3 else [] %}
+        {% if rest %}
+        <tr>
+          <td style="background:#0f0f0f;padding:22px 28px 18px;" class="inner-pad">
+            <p style="margin:0 0 14px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.18em;color:#2a2a2a;text-transform:uppercase;">Full Classification</p>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
 
+              <!-- Col headers -->
               <tr>
-                <td width="30" style="padding:0 0 8px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.1em;color:#222;text-transform:uppercase;">P</td>
-                <td style="padding:0 0 8px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.1em;color:#222;text-transform:uppercase;">Driver</td>
-                <td align="right" style="padding:0 0 8px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.1em;color:#222;text-transform:uppercase;">Gap / Status</td>
-                <td align="right" width="36" style="padding:0 0 8px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.1em;color:#222;text-transform:uppercase;">Pts</td>
+                <td width="24" style="padding-bottom:8px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.1em;color:#222;text-transform:uppercase;">P</td>
+                <td style="padding-bottom:8px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.1em;color:#222;text-transform:uppercase;">Driver</td>
+                <td class="col-grid" align="center" width="40" style="padding-bottom:6px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.1em;color:#222;text-transform:uppercase;">Δ</td>
+                <td class="col-time" align="right" style="padding-bottom:8px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.1em;color:#222;text-transform:uppercase;">Gap</td>
+                <td class="col-pts" align="right" width="32" style="padding-bottom:8px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.1em;color:#222;text-transform:uppercase;">Pts</td>
               </tr>
 
-              {% for r in results %}
-              {% set finished = r.status in ['Finished', '+1 Lap', '+2 Laps'] or r.time | string | first == '+' %}
-              <tr style="border-bottom:1px solid #141414;">
+              {% for r in rest %}
+              {% set is_dnf = r.status == 'DNF' or r.status == 'DSQ' or r.status == 'DNS' %}
+              <tr style="border-bottom:1px solid #2a2a2a;">
 
-                <td style="padding:8px 0 8px 4px;vertical-align:middle;">
-                  <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;
-                    font-size:{% if r.position | int <= 3 %}16px{% else %}12px{% endif %};
-                    color:{% if r.position | int == 1 %}#C9A84C{% elif r.position | int == 2 %}#9E9E9E{% elif r.position | int == 3 %}#8B5A2B{% else %}#2e2e2e{% endif %};">
+                <td style="padding:8px 0;vertical-align:middle;">
+                  <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:12px;
+                    color: #848484;">
                     {{ r.position }}
                   </span>
                 </td>
 
-                <td style="padding:8px 8px 8px 0;vertical-align:middle;">
-                  <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:12px;letter-spacing:0.03em;text-transform:uppercase;
-                    color:{% if r.position | int <= 3 %}#e0e0e0{% elif r.position | int <= 10 %}#555{% else %}#2e2e2e{% endif %};">
-                    {{ r.abbreviation }}
-                  </span>
-                  <span style="font-family:'Courier New',monospace;font-size:9px;color:#1e1e1e;margin-left:5px;">
-                    {{ r.team | truncate(10, true, '') }}
-                  </span>
+                <td style="padding:10px 10px 10px 0;vertical-align:middle;">
+                  <table role="presentation" cellpadding="0" cellspacing="0">
+                    <tr>
+                      {% if r.image %}
+                      <td style="padding-right:8px;vertical-align:middle;">
+                        <img class="headshot-sm" src="{{ r.image }}" width="36" height="36" alt="{{ r.driver }}"
+                          style="display:block;width:36px;height:36px;object-fit:cover;object-position:top;border-radius:2px;
+                                 border-left:2px solid #{{ r.teamColor if r.teamColor else '2a2a2a' }};">
+                      </td>
+                      {% else %}
+                      <td style="width:2px;background:#{{ r.teamColor if r.teamColor else '2a2a2a' }};border-radius:1px;">&nbsp;</td>
+                      {% endif %}
+                      <td style="{% if not r.image %}padding-left:7px;{% endif %}vertical-align:middle;">
+                        <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:12px;letter-spacing:0.04em;text-transform:uppercase;
+                          color:{% if is_dnf %}#333{% else %}#888{% endif %};">
+                          {{ r.driver }}
+                        </span>
+                        <span style="font-family:'Courier New',monospace;font-size:8px;color:#6c6c6c;display:block;margin-top:1px;">
+                          {{ r.team | truncate(14, true, '') }}
+                        </span>
+                      </td>
+                    </tr>
+                  </table>
                 </td>
 
-                <td align="right" style="padding:8px 4px;font-family:'Courier New',monospace;font-size:9px;
-                  color:{% if not finished %}#E8001D{% else %}#2e2e2e{% endif %};">
-                  {% if not finished %}
-                    {{ r.status }}
-                  {% elif r.position | int == 1 %}
-                    {{ r.time }}
+                <td class="col-grid" align="center" style="padding:8px 4px;vertical-align:middle;">
+                  {% if r.pos_delta > 0 %}
+                  <span style="font-family:'Courier New',monospace;font-size:10px;color:#3fa83f;">▲{{ r.pos_delta }}</span>
+                  {% elif r.pos_delta < 0 %}
+                  <span style="font-family:'Courier New',monospace;font-size:9px;color:#c84949;">▼{{ r.pos_delta | abs }}</span>
                   {% else %}
-                    +{{ r.time }}
+                  <span style="font-family:'Courier New',monospace;font-size:9px;color:#6a6a6a;">=</span>
                   {% endif %}
                 </td>
 
-                <td align="right" style="padding:8px 4px;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:12px;
-                  color:{% if r.points > 0 %}#E8001D{% else %}#1e1e1e{% endif %};">
-                  {% if r.points > 0 %}{{ r.points | int }}{% else %}—{% endif %}
+                <td class="col-time" align="right" style="padding:8px 4px;vertical-align:middle;">
+                  {% if r.status == 'DNF' or r.status == 'DSQ' or r.status == 'DNS' %}
+                    <span style="font-family:'Courier New',monospace;font-size:10px;color:#c52f43;text-transform:uppercase;">{{ r.status }}</span>
+                  {% elif r.lapped %}
+                    <span style="font-family:'Courier New',monospace;font-size:10px;color:#9e9e9e;">+{{ r.lapped }} Lap{% if r.lapped > 1 %}s{% endif %}</span>
+                  {% elif r.time and r.time != '-' %}
+                    <span style="font-family:'Courier New',monospace;font-size:10px;color:#a0a0a0;">+{{ r.time }}</span>
+                  {% else %}
+                    <span style="font-family:'Courier New',monospace;font-size:10px;color:#454545;">—</span>
+                  {% endif %}
+                </td>
+
+                <td class="col-pts" align="right" style="padding:8px 0;vertical-align:middle;">
+                  <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:11px;
+                    color:{% if r.points > 0 %}#555{% else %}#222{% endif %};">
+                    {% if r.points > 0 %}{{ r.points | int }}{% else %}—{% endif %}
+                  </span>
                 </td>
 
               </tr>
+              {% endfor %}
+            </table>
+          </td>
+        </tr>
+        <tr><td style="height:1px;background:#1a1a1a;font-size:0;line-height:0;">&nbsp;</td></tr>
+        {% endif %}
+
+        <!-- FASTEST LAP -->
+        {% if fastest_lap %}
+        <tr>
+          <td style="background:#0d0d0d;padding:14px 28px;" class="inner-pad">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="border-left:2px solid #6600cc;padding-left:12px;">
+                  <p style="margin:0 0 2px;font-family:'Courier New',monospace;font-size:11px;letter-spacing:0.18em;color:#bdbdbd;text-transform:uppercase;">
+                    Fastest Lap
+                  </p>
+                  <p style="margin:0;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:12px;letter-spacing:0.04em;text-transform:uppercase;color:#7733cc;">
+                    {{ fastest_lap.driver }}
+                    <span style="font-family:'Courier New',monospace;font-size:15px;color:#6600cc;font-weight:700;letter-spacing:0.06em;">
+                      {{ fastest_lap.time }}
+                    </span>
+                    <span style="font-family:'Courier New',monospace;font-size:11px;color:#2a2a2a;font-weight:400;">
+                      · Lap {{ fastest_lap.lap }}
+                    </span>
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr><td style="height:1px;background:#1a1a1a;font-size:0;line-height:0;">&nbsp;</td></tr>
+        {% endif %}
+
+        <!-- CHAMPIONSHIP GAP -->
+         {% if championship_gap %}
+        <tr>
+          <td style="background:#0d0d0d;padding:20px 28px;">
+            <p style="margin:0 0 14px;font-family:'Courier New',monospace;font-size:12px;letter-spacing:0.2em;color:#717070;text-transform:uppercase;">CHAMPIONSHIP GAP</p>
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+              {% for c in championship_gap.contenders %}
+              <tr>
+                <td style="width:3px; background:{{ c.color }}; padding:0;">&nbsp;</td>
+                
+                <td style="padding:4px 12px; width:110px;">
+                  <div style="font-family:'Courier New',monospace; font-size:12px; color:#fff; line-height:1;">
+                    {{ c.driver }} <span style="color:#cecece; font-size:11px;"> {{ c.points }}pts</span>
+                  </div>
+                </td>
+                
+                <td style="padding:4px 0;">
+                  <div style="font-family:'Courier New',monospace; font-size:11px; line-height:1; color:{{ c.color }}; letter-spacing:-1px;">
+                    {{ c.bar }}
+                  </div>
+                </td>
+              </tr>
+              <tr><td colspan="3" style="font-size:4px; line-height:4px;">&nbsp;</td></tr>
               {% endfor %}
             </table>
           </td>
         </tr>
         {% endif %}
 
+        <!-- DRIVER STANDINGS TOP 5 -->
+        {% if driver_standings %}
+        <tr>
+          <td style="background:#0f0f0f;padding:24px 28px;" class="inner-pad">
+            <p style="margin:0 0 14px;font-family:'Courier New',monospace;font-size:12px;letter-spacing:0.2em;color:#717070;text-transform:uppercase;">DRIVERS · TOP 5</p>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              {% for d in driver_standings[:10] %}
+              <tr style="border-bottom:1px solid #141414;">
+                <td width="28" style="padding:9px 0 9px 4px;">
+                  <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:{% if loop.index <= 3 %}16px{% else %}13px{% endif %};
+                    color:{% if loop.index == 1 %}#C9A84C{% elif loop.index == 2 %}#9E9E9E{% elif loop.index == 3 %}#8B5A2B{% else %}#2e2e2e{% endif %};">
+                    {{ d.position }}
+                  </span>
+                </td>
+                <td style="padding:9px 8px 9px 0;">
+                  <span style="display:inline-block;width:3px;height:12px;background:{{ d.team_colour }};vertical-align:middle;margin-right:7px;"></span>
+                  <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:0.03em;text-transform:uppercase;
+                    color:{% if loop.index <= 3 %}#e0e0e0{% else %}#555{% endif %};">
+                    {{ d.driver }}
+                  </span>
+                </td>
+                <td align="right" style="padding:9px 4px;">
+                  <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:{% if loop.index <= 3 %}14px{% else %}12px{% endif %};
+                    color:{% if loop.index == 1 %}#C9A84C{% elif loop.index <= 3 %}#777{% else %}#333{% endif %};">
+                    {{ d.points | int }}
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+            </table>
+          </td>
+        </tr>
         <tr><td style="height:1px;background:#1a1a1a;font-size:0;line-height:0;">&nbsp;</td></tr>
+        {% endif %}
+
+        <!-- CONSTRUCTOR STANDINGS TOP 5 -->
+        {% if constructor_standings %}
+        <tr>
+          <td style="background:#0d0d0d;padding:24px 28px;" class="inner-pad">
+            <p style="margin:0 0 14px;font-family:'Courier New',monospace;font-size:12px;letter-spacing:0.2em;color:#717070;text-transform:uppercase;">CONSTRUCTORS · TOP 5</p>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              {% for c in constructor_standings[:5] %}
+              <tr style="border-bottom:1px solid #141414;border-right:3px solid {{ c.colour }};">
+                <td width="28" style="padding:9px 0 9px 10px;">
+                  <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:{% if loop.index <= 3 %}16px{% else %}13px{% endif %};
+                    color:{% if loop.index == 1 %}#C9A84C{% elif loop.index == 2 %}#9E9E9E{% elif loop.index == 3 %}#8B5A2B{% else %}#2e2e2e{% endif %};">
+                    {{ c.position }}
+                  </span>
+                </td>
+                <td style="padding:9px 8px 9px 0;">
+                  <span style="display:inline-block;width:3px;height:12px;background:{{ c.colour }};vertical-align:middle;margin-right:7px;"></span>
+                  <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:0.03em;text-transform:uppercase;
+                    color:{% if loop.index <= 3 %}#e0e0e0{% else %}#555{% endif %};">
+                    {{ c.team }}
+                  </span>
+                </td>
+                <td align="right" style="padding:9px 4px;">
+                  <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:{% if loop.index <= 3 %}14px{% else %}12px{% endif %};
+                    color:{% if loop.index == 1 %}#C9A84C{% elif loop.index <= 3 %}#777{% else %}#333{% endif %};">
+                    {{ c.points | int }}
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+            </table>
+          </td>
+        </tr>
+        <tr><td style="height:1px;background:#1a1a1a;font-size:0;line-height:0;">&nbsp;</td></tr>
+        {% endif %}
+
+        <!-- NEXT RACE -->
+        <tr>
+          <td style="background:#0a0a0a;padding:18px 28px;" class="inner-pad">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="border-left:2px solid #1a1a1a;padding-left:14px;">
+                  <p style="margin:0 0 3px;font-family:'Courier New',monospace;font-size:11px;letter-spacing:0.18em;color:#6f6f6f;text-transform:uppercase;">
+                    Up Next · Round {{ next_race.round }}
+                  </p>
+                  <p style="margin:0;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:14px;letter-spacing:0.04em;text-transform:uppercase;color:#adadad;">
+                    {{ next_race.name }}
+                    {% if next_race.is_sprint %}
+                    <span style="display:inline-block;background-color:#2a0a14;color:#6a1a2a;padding:1px 7px;margin-left:6px;border-radius:10px;font-size:9px;vertical-align:middle;letter-spacing:0.1em;">
+                      SPRINT
+                    </span>
+                    {% endif %}
+                  </p>
+                  <p style="margin:3px 0 0;font-family:'Courier New',monospace;font-size:11px;color:#636363;">
+                    {{ next_race.location }}, {{ next_race.country }}
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr><td style="height:1px;background:#141414;font-size:0;line-height:0;">&nbsp;</td></tr>
 
         <!-- FOOTER -->
         <tr>
-          <td style="background:#0a0a0a;padding:22px 32px;">
+          <td style="background:#0a0a0a;padding:20px 28px;" class="inner-pad">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
               <tr>
                 <td>
                   <p style="margin:0;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.12em;color:#282828;text-transform:uppercase;line-height:1.8;">
-                    You subscribed at lightsout.vercel.app<br>
-                    <a href="{{ unsubscribe_url }}" style="color:#282828;text-decoration:none;">Unsubscribe</a>
+                    You subscribed at LightsOut<br>
+                    <a href="{{ unsubscribe_url }}" style="color:#117aaa;text-decoration:none;">Unsubscribe</a>
                   </p>
                 </td>
                 <td align="right" valign="bottom">
