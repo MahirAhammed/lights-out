@@ -12,6 +12,9 @@ from datetime import datetime, timezone, timedelta
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from fastapi import Request
+from utils.logger import get_logger
+
+logger = get_logger("subscribers")
 
 limiter = Limiter(key_func=get_remote_address)
 router = APIRouter()
@@ -78,7 +81,7 @@ async def verify(request: Request, token: str, db: AsyncSession = Depends(get_db
     try:
         await send_welcome_email(subscriber.email, subscriber.name or "F1 Fan", subscriber.unsubscribe_token, db)
     except Exception as e:
-        print(f"Welcome email failed: {e}")
+        logger.warning("Expired verification token deleted: %s", subscriber.email)
 
     return RedirectResponse(url=f"{settings.frontend_url}/verify.html?status=success", status_code=302)
 
