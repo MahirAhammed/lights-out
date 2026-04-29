@@ -30,17 +30,17 @@ FLAGS = {
 }
 
 CONSTRUCTOR_COLOURS = {
-    "red_bull":         "#25487A",
-    "mclaren":          "#FF8800",
-    "ferrari":          "#E8002D",
-    "mercedes":         "#75F1D3",
+    "red_bull":         "#4781D7",
+    "mclaren":          "#F47600",
+    "ferrari":          "#ED1131",
+    "mercedes":         "#00D7B6",
     "aston_martin":     "#229971",
-    "alpine":           "#FF87BC",
-    "haas":             "#F5F5F5",
-    "rb":               "#6692FF",
-    "williams":         "#005CAA",
-    "audi":             "#5D615D",
-    "cadillac":         "#BE991E"
+    "alpine":           "#00A1E8",
+    "haas":             "#9C9FA2",
+    "rb":               "#6C98FF",
+    "williams":         "#1868DB",
+    "audi":             "#F50537",
+    "cadillac":         "#909090"
 }
 
 NATIONAL_FLAGS = {

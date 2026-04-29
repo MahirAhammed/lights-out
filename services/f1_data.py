@@ -347,27 +347,39 @@ def get_qualifying_results(year: int, round_number: int) -> list[dict]:
         return []
 
 
+def _build_championship_gap(standings: list[dict]) -> dict | None:
+    if len(standings) < 2:
+        return None
+
+    leader_pts = standings[0]["points"]
+    total_bar = 30
+    char = "█"
+    contenders = []
+
+    for i, d in enumerate(standings[:5]):
+        num_blocks = max(1, int((d["points"] / leader_pts) * total_bar))
+        contenders.append({
+            "driver": d["driver"],
+            "team": d["team"],
+            "points": int(d["points"]),
+            "bar": char * num_blocks,
+            "color": d.get("team_colour", ""),
+        })
+    return {"contenders":  contenders,}
+
 async def get_pre_race_package(year: int, round_number: int) -> dict:
     track, driver_standings, constructor_standings = await asyncio.gather(
         get_track_info(year, round_number),
         get_driver_standings(year),
         get_constructor_standings(year),
     )
-    gap = None
     driver_standings = driver_standings["standings"]
-    if len(driver_standings) >= 2:
-        gap = {
-            "leader":      driver_standings[0]["driver"],
-            "second":      driver_standings[1]["driver"],
-            "points_gap":  int(driver_standings[0]["points"] - driver_standings[1]["points"]),
-            "rounds_left": 24 - track["round"],
-        }
-
+   
     return {
         "track": track,
         "driver_standings": driver_standings,
         "constructor_standings": constructor_standings,
-        "championship_gap": gap
+        "championship_gap": _build_championship_gap(driver_standings)
     }
 
 async def get_race_results_package(year: int, round_number: int, is_sprint: bool = False) -> dict:
@@ -382,15 +394,6 @@ async def get_race_results_package(year: int, round_number: int, is_sprint: bool
     )
  
     standings = driver_standings_data.get("standings", [])
-    gap = None
-    if len(standings) >= 2:
-        gap = {
-            "leader":      standings[0]["driver"],
-            "second":      standings[1]["driver"],
-            "points_gap":  int(standings[0]["points"] - standings[1]["points"]),
-            "rounds_left": 24 - track["round"],
-        }
-    
     if is_sprint:
         next_race = next((r for r in schedule if r["round"] == track["round"]), None)
     else:
@@ -405,7 +408,7 @@ async def get_race_results_package(year: int, round_number: int, is_sprint: bool
         "results":              race_data.get("results", []),
         "fastest_lap":          race_data.get("fastest_lap"),
         "next_race":            next_race,
-        "championship_gap":     gap,
+        "championship_gap":     _build_championship_gap(standings),
         "driver_standings":     standings,
         "constructor_standings": constructor_standings,
     }

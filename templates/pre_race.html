@@ -46,14 +46,14 @@
         <!-- HERO -->
         <tr>
           <td style="background:#0f0f0f;padding:36px 32px 28px;">
-            <p style="margin:0 0 12px;font-family:'Courier New',monospace;font-size:12px; font-weight:700; letter-spacing:0.22em;color:#d32035;text-transform:uppercase;">
+            <p style="margin:0 0 4px;font-family:'Courier New',monospace;font-size:12px; font-weight:700; letter-spacing:0.22em;color:#d32035;text-transform:uppercase;">
               // RACE WEEKEND PREVIEW
               
             </p>
             {% if track.is_sprint %}
-              <span style="display:inline-block;background-color:#a60a1c;color:#ffffff;padding:2px 8px;margin-left:8px;border-radius:12px;font-size:10px;vertical-align:middle;letter-spacing:0.1em;">
+              <p style="margin:0 0 4px; display:inline-block;background-color:#a60a1c;color:#ffffff;padding:2px 8px;margin-left:8px;border-radius:12px;font-size:10px;vertical-align:middle;letter-spacing:0.1em;">
                 SPRINT WEEKEND
-              </span>
+              </p>
               {% endif %}
             <h1 style="margin:0 0 8px;font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:42px;line-height:0.92;letter-spacing:-0.02em;color:#f0f0f0;text-transform:uppercase;">
               {{ track.name | upper }}
@@ -74,7 +74,7 @@
               <tr>
                 
                 {% if track.history.corners %}
-                <td style="vertical-align:top; width:50%; background:#262626; border:2px solid #d20c23; border-radius:4px; padding:12px 14px;">
+                <td style="vertical-align:top; width:50%; background:#141414; border:2px solid #d20c23; border-radius:4px; padding:12px 14px;">
                   <p style="margin:0 0 5px;font-family:'Courier New',monospace;font-size:12px;color:#838383;text-transform:uppercase;letter-spacing:0.18em;">Corners</p>
                   <p style="margin:0;font-family:'Arial Narrow',Arial,sans-serif;letter-spacing:0.25em;font-weight:700;font-size:26px;color:#d1d1d1;">
                     {{ track.history.corners }}
@@ -87,7 +87,7 @@
                 {% endif %}
 
                 {% if track.history.total_laps %}
-                <td style="vertical-align:top; width:50%; background:#262626; border:2px solid #d20c23; border-radius:4px; padding:12px 14px;">
+                <td style="vertical-align:top; width:50%; background:#141414; border:2px solid #d20c23; border-radius:4px; padding:12px 14px;">
                   <p style="margin:0 0 5px;font-family:'Courier New',monospace;font-size:12px;letter-spacing:0.18em;color:#838383;text-transform:uppercase;">Race Laps</p>
                   <p style="margin:0;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:28px;color:#d1d1d1;letter-spacing: 0.25em;">
                     {{ track.history.total_laps }}
@@ -132,28 +132,26 @@
 
         <!-- CIRCUIT HISTORY -->
         <tr>
-          <td style="background:#0d0d0d;padding:24px 32px;">
+          <td style="background:#0d0d0d;padding:20px 22px;">
             <p style="margin:0 0 16px;font-family:'Courier New',monospace;font-size:12px;letter-spacing:0.2em;color:#5a5a5a;text-transform:uppercase;">
               CIRCUIT HISTORY
             </p>
  
             {% if track.history %}
- 
             <!-- Last winner + pole sitter cards -->
             {% if track.history.last_winner or track.history.last_pole %}
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px;">
               <tr>
- 
                 {% if track.history.last_winner %}
                 <td style="padding:0 4px 0 0;vertical-align:top;width:50%;">
                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                     <tr>
-                      <td style="background:#313131;border:1px solid #1e1e1e;padding:12px 14px;border-radius:4px;">
-                        <p style="margin:0 0 6px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.16em;color:#5a5a5a;text-transform:uppercase;">Last Winner</p>
+                      <td style="background:#141414;border:1px solid #d20c23;padding:12px 14px;border-radius:4px;">
+                        <p style="margin:0 0 6px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.16em;color:#6d6d6d;text-transform:uppercase;">Last Winner</p>
                         <p style="margin:0 0 3px;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:14px;letter-spacing:0.04em;text-transform:uppercase;color:#afafaf;line-height:1.2;">
                           {{ track.history.last_winner.driver }}
                         </p>
-                        <p style="margin:0;font-family:'Courier New',monospace;font-size:10px;color:#2e2e2e;">
+                        <p style="margin:0;font-family:'Courier New',monospace;font-size:12px;color:#beb1b1;">
                           {{ track.history.last_winner.team }}
                         </p>
                       </td>
@@ -166,13 +164,13 @@
                 <td style="padding:0 0 0 4px;vertical-align:top;width:50%;">
                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                     <tr>
-                      <td style="background:#313131;border:1px solid #1e1e1e;padding:12px 14px;border-radius:4px;">
-                        <p style="margin:0 0 6px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.16em;color:#3a3a3a;text-transform:uppercase;">Last Pole</p>
+                      <td style="background:#141414;border:1px solid #d20c23;padding:12px 14px;border-radius:4px;">
+                        <p style="margin:0 0 6px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.16em;color:#6d6d6d;text-transform:uppercase;">Last Pole</p>
                         <p style="margin:0 0 3px;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:14px;letter-spacing:0.04em;text-transform:uppercase;color:#888;line-height:1.2;">
                           {{ track.history.last_pole.driver }}
                         </p>
-                        <p style="margin:0;font-family:'Courier New',monospace;font-size:10px;color:#2e2e2e;">
-                          {{ track.history.last_pole.time }}
+                        <p style="margin:0;font-family:'Courier New',monospace;font-size:10px;color:#beb1b1;">
+                          {{track.history.last_pole.team}} [ {{ track.history.last_pole.time }} ]
                         </p>
                       </td>
                     </tr>
@@ -193,14 +191,14 @@
                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                     {% for w in track.history.recent_winners %}
                     <tr {% if not loop.last %}style="border-bottom:1px solid #1c1c1c;"{% endif %}>
-                      <td style="padding:6px 0;font-family:'Courier New',monospace;font-size:10px;color:#2e2e2e;width:36px;">
+                      <td style="padding:6px 0;font-family:'Courier New',monospace;font-size:9px;color:#737373;width:26px;">
                         {{ w.year }}
                       </td>
-                      <td style="padding:6px 0;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:0.03em;text-transform:uppercase;color:#666;">
-                        {{ w.image }} {{ w.driver }}
+                      <td style="padding:6px 0;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:12px;letter-spacing:0.03em;text-transform:uppercase;color:#9c9c9c;">
+                        {{ w.driver }}
                       </td>
                       <td align="right" style="padding:6px 0;">
-                        <span style="font-family:'Courier New',monospace;font-size:10px;color:#c9c9c9;background:#1a1a1a;border:1px solid #222;padding:2px 6px;border-radius:10px;white-space:nowrap;">
+                        <span style="font-family:'Courier New',monospace;font-size:10px;color:#888;background:#151515;border:1px solid #545353;padding:2px 6px;border-radius:10px;white-space:nowrap;">
                           {{ w.team }}
                         </span>
                       </td>
@@ -222,38 +220,42 @@
 
         <tr><td style="height:1px;background:#1a1a1a;font-size:0;line-height:0;">&nbsp;</td></tr>
 
-        <!-- CHAMPIONSHIP GAP -->
         {% if championship_gap %}
         <tr>
-          <td style="background:#0f0f0f;padding:18px 32px;">
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+          <td style="background:#0d0d0d;padding:20px 28px;">
+            <p style="margin:0 0 14px;font-family:'Courier New',monospace;font-size:12px;letter-spacing:0.2em;color:#717070;text-transform:uppercase;">CHAMPIONSHIP GAP</p>
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+              {% for c in championship_gap.contenders %}
               <tr>
-                <td style="border-left:2px solid #d20c23;padding-left:14px;">
-                  <p style="margin:0 0 3px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.18em;color:#2e2e2e;text-transform:uppercase;">
-                    Drivers championship gap
-                  </p>
-                  <p style="margin:0;font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:15px;letter-spacing:0.03em;text-transform:uppercase;color:#888;">
-                    {{ championship_gap.leader }}
-                    <span style="color:#d20c23;"> +{{ championship_gap.points_gap }}pts </span>
-                    over {{ championship_gap.second }}
-                    <span style="font-family:'Courier New',monospace;font-size:9px;color:#2e2e2e;font-weight:400;">
-                      · {{ championship_gap.rounds_left }} rounds left
-                    </span>
-                  </p>
+                <td style="width:3px; background:{{ c.color }}; padding:0;">&nbsp;</td>
+                
+                <td style="padding:4px 12px; width:110px;">
+                  <div style="font-family:'Courier New',monospace; font-size:12px; color:#fff; line-height:1;">
+                    {{ c.driver }} <span style="color:#cecece; font-size:11px;"> {{ c.points }}pts</span>
+                  </div>
+                </td>
+                
+                <td style="padding:4px 0;">
+                  <div style="font-family:'Courier New',monospace; font-size:11px; line-height:1; color:{{ c.color }}; letter-spacing:-1px;">
+                    {{ c.bar }}
+                  </div>
                 </td>
               </tr>
+              <tr><td colspan="3" style="font-size:4px; line-height:4px;">&nbsp;</td></tr>
+              {% endfor %}
             </table>
           </td>
         </tr>
-        <tr><td style="height:1px;background:#1a1a1a;font-size:0;line-height:0;">&nbsp;</td></tr>
         {% endif %}
-
+        
+        <tr><td style="height:1px;background:#1a1a1a;font-size:0;line-height:0;">&nbsp;</td></tr>
+        
         <!-- DRIVER STANDINGS -->
         <tr>
           <td style="background:#0f0f0f;padding:24px 32px;">
             <p style="margin:0 0 14px;font-family:'Courier New',monospace;font-size:12px;letter-spacing:0.2em;color:#717070;text-transform:uppercase;">DRIVERS · TOP 5</p>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-              {% for d in driver_standings[:5] %}
+              {% for d in driver_standings[:10] %}
               <tr style="border-bottom:1px solid #141414;">
                 <td width="28" style="padding:9px 0 9px 4px;">
                   <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:{% if loop.index <= 3 %}16px{% else %}13px{% endif %};
@@ -287,7 +289,7 @@
           <td style="background:#0d0d0d;padding:24px 32px;">
             <p style="margin:0 0 14px;font-family:'Courier New',monospace;font-size:12px;letter-spacing:0.2em;color:#717070;text-transform:uppercase;">CONSTRUCTORS · TOP 5</p>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-              {% for c in constructor_standings[:5] %}
+              {% for c in constructor_standings %}
               <tr style="border-bottom:1px solid #141414;border-left:3px solid {{ c.colour }};">
                 <td width="28" style="padding:9px 0 9px 10px;">
                   <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:{% if loop.index <= 3 %}16px{% else %}13px{% endif %};
