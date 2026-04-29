@@ -9,32 +9,44 @@
   body, table, td { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
   table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
   body { margin: 0; padding: 0; background-color: #0a0a0a; }
+  @media only screen and (max-width: 480px) {
+    .outer-pad { padding: 16px 6px !important; }
+    .inner-pad { padding: 18px 16px !important; }
+    .hero-name { font-size: 34px !important; }
+    .pole-card { padding: 18px 16px !important; }
+    .headshot { width: 70px !important; height: 70px !important;}
+    .headshot2 { width: 40px !important; height: 40px !important;}
+    .q3-time { font-size: 20px !important; }
+    .col-q1, .col-q2 { display: none !important; width: 0 !important; overflow: hidden !important; max-height: 0 !important; }
+    .abbr-cell { font-size: 12px !important; }
+    .team-cell { font-size: 8px !important; }
+    .gap-cell  { font-size: 9px !important; }
+    .best-cell { font-size: 9px !important; }
+  }
 </style>
 </head>
 <body style="margin:0;padding:0;background-color:#0a0a0a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
 
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0a0a0a;">
   <tr>
-    <td align="center" style="padding:32px 12px;">
+    <td align="center" class="outer-pad" style="padding:32px 12px;">
       <table role="presentation" width="100%" style="max-width:540px;" cellpadding="0" cellspacing="0">
 
-        <!-- TOP BAR -->
-        <tr><td style="height:3px;background:#E8001D;font-size:0;line-height:0;">&nbsp;</td></tr>
+        <tr><td style="height:3px;background:#d20c23;font-size:0;line-height:0;">&nbsp;</td></tr>
 
-        <!-- HEADER -->
         <tr>
-          <td style="background:#111;padding:24px 32px;">
+          <td style="background:#111;padding:20px 28px;" class="inner-pad">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
               <tr>
                 <td>
                   <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:22px;letter-spacing:0.15em;color:#f0f0f0;text-transform:uppercase;">
-                    LIGHTS<span style="color:#E8001D;">OUT</span>
+                    LIGHTS<span style="color:#d20c23;">OUT</span>
                   </span>
                 </td>
                 <td align="right">
-                  <span style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.16em;color:#333;text-transform:uppercase;">
+                  <span style="font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.14em;color:#333;text-transform:uppercase;">
                     {% if is_sprint_quali %}SPRINT SHOOTOUT{% else %}QUALIFYING{% endif %}
-                    · Round {{ round }}
+                    &nbsp;·&nbsp;Round {{ round }}
                   </span>
                 </td>
               </tr>
@@ -42,45 +54,54 @@
           </td>
         </tr>
 
-        <tr><td style="height:1px;background:linear-gradient(to right,#E8001D,#3a0008);font-size:0;line-height:0;">&nbsp;</td></tr>
+        <tr><td style="height:1px;background:linear-gradient(to right,#d20c23,#3a0008);font-size:0;line-height:0;">&nbsp;</td></tr>
 
-        <!-- HERO -->
         <tr>
-          <td style="background:#0f0f0f;padding:36px 32px 28px;">
-            <p style="margin:0 0 12px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.22em;color:#E8001D;text-transform:uppercase;">
+          <td style="background:#0f0f0f;padding:32px 28px 24px;" class="inner-pad">
+            <p style="margin:0 0 10px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.22em;color:#d20c23;text-transform:uppercase;">
               // {% if is_sprint_quali %}SPRINT SHOOTOUT RESULTS{% else %}QUALIFYING RESULTS{% endif %}
             </p>
-            <h1 style="margin:0 0 8px;font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:44px;line-height:0.92;letter-spacing:-0.02em;color:#f0f0f0;text-transform:uppercase;">
+            <h1 class="hero-name" style="margin:0 0 8px;font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:40px;line-height:0.92;letter-spacing:-0.02em;color:#f0f0f0;text-transform:uppercase;">
               {{ race_name | upper }}<br>
-              <span style="color:#E8001D;">GRID SET.</span>
+              <span style="color:#d20c23;">GRID SET.</span>
             </h1>
             <p style="margin:10px 0 0;font-family:'Courier New',monospace;font-size:10px;color:#444;">
-              {{ year }} season · Round {{ round }}
+              {{ year }} season &nbsp;·&nbsp; Round {{ round }}
             </p>
           </td>
         </tr>
 
         <tr><td style="height:1px;background:#1a1a1a;font-size:0;line-height:0;">&nbsp;</td></tr>
 
-        <!-- POLE POSITION -->
-        {% if results %}
+        {% if results and results|length > 0 %}
+        {% set pole = results[0] %}
         <tr>
-          <td style="background:#0d0d0d;padding:20px 32px;">
+          <td class="pole-card" style="background:#0d0d0d;padding:22px 28px;">
+            <p style="margin:0 0 14px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.2em;color:#333;text-transform:uppercase;">POLE POSITION</p>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
               <tr>
-                <td style="border-left:2px solid #E8001D;padding-left:14px;">
-                  <p style="margin:0 0 3px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.18em;color:#333;text-transform:uppercase;">
-                    Pole position
+                <td width="90" valign="bottom" style="padding-right:16px;">
+                  {% if pole.image %}
+                  <img class="headshot" src="{{ pole.image }}" width="90" height="90" alt="{{ pole.driver }}"
+                    style="display:block;width:90px;height:90px;object-fit:cover;object-position:top;border-radius:4px;
+                           border-bottom:3px solid #{{ pole.teamColor if pole.teamColor else 'd20c23' }};">
+                  {% else %}
+                  <div class="headshot" style="width:90px;height:90px;background:#1a1a1a;border-radius:4px;
+                       border-bottom:3px solid #{{ pole.teamColor if pole.teamColor else 'd20c23' }};"></div>
+                  {% endif %}
+                </td>
+                <td valign="middle">
+                  <p style="margin:0 0 2px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.14em;color:#555;text-transform:uppercase;">
+                    P1 &nbsp;·&nbsp; {{ pole.team }}
                   </p>
-                  <p style="margin:0;font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:20px;letter-spacing:0.02em;text-transform:uppercase;color:#f0f0f0;">
-                    {{ results[0].driver }}
+                  <p style="margin:0 0 8px;font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:22px;letter-spacing:0.02em;text-transform:uppercase;color:#f0f0f0;">
+                    {{ pole.driver }}
                   </p>
-                  <p style="margin:4px 0 0;font-family:'Courier New',monospace;font-size:10px;color:#444;">
-                    {{ results[0].team }}
-                    {% if results[0].q3 and results[0].q3 != '-' %}
-                    &nbsp;·&nbsp; {{ results[0].q3 }}
-                    {% endif %}
+                  {% if pole.q3 and pole.q3 != '-' %}
+                  <p class="q3-time" style="margin:0;font-family:'Courier New',monospace;font-weight:700;font-size:24px;color:#aeaa59;letter-spacing:0.04em;">
+                    {{ pole.q3 }}
                   </p>
+                  {% endif %}
                 </td>
               </tr>
             </table>
@@ -89,54 +110,61 @@
         <tr><td style="height:1px;background:#1a1a1a;font-size:0;line-height:0;">&nbsp;</td></tr>
         {% endif %}
 
-        <!-- GRID -->
+        {% set q3_results = results | selectattr('position', 'gt', 1) | selectattr('position', 'le', 10) | list %}
+        {% if q3_results %}
         <tr>
-          <td style="background:#0f0f0f;padding:24px 32px;">
-            <p style="margin:0 0 14px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:0.2em;color:#333;text-transform:uppercase;">FULL GRID</p>
+          <td style="background:#0f0f0f;padding:22px 28px 18px;" class="inner-pad">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-
-              <!-- Column headers -->
               <tr>
-                <td width="30" style="padding:0 0 8px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.1em;color:#222;text-transform:uppercase;">P</td>
-                <td style="padding:0 0 8px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.1em;color:#222;text-transform:uppercase;">Driver</td>
-                <td align="right" width="52" style="padding:0 0 8px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.1em;color:#222;text-transform:uppercase;">Q1</td>
-                <td align="right" width="52" style="padding:0 0 8px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.1em;color:#222;text-transform:uppercase;">Q2</td>
-                <td align="right" width="52" style="padding:0 0 8px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.1em;color:#222;text-transform:uppercase;">Q3</td>
+                <td width="30" style="padding-bottom:6px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.1em;color:#222;text-transform:uppercase;">P</td>
+                <td width="50" style="padding-bottom:6px;">&nbsp;</td>
+                <td style="padding-bottom:6px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.1em;color:#222;text-transform:uppercase;">Driver</td>
+                <td align="right" style="padding-bottom:6px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.1em;color:#222;text-transform:uppercase;">Time</td>
+                <td align="right" width="40" style="padding-bottom:6px;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.1em;color:#222;text-transform:uppercase;">Gap to Leader</td>
               </tr>
 
-              {% for r in results %}
-              {% set top3 = r.position <= 3 %}
+              {% for r in q3_results %}
               <tr style="border-bottom:1px solid #141414;">
 
-                <td style="padding:9px 0 9px 4px;vertical-align:middle;">
-                  <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;
-                    font-size:{% if top3 %}17px{% else %}13px{% endif %};
-                    color:{% if r.position == 1 %}#C9A84C{% elif r.position == 2 %}#9E9E9E{% elif r.position == 3 %}#8B5A2B{% else %}#2e2e2e{% endif %};">
+                <td style="padding:8px 0;vertical-align:middle;">
+                  <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:12px;
+                    color:{% if r.position == 2 %}#9E9E9E{% elif r.position == 3 %}#8B5A2B{% else %}#2a2a2a{% endif %};">
                     {{ r.position }}
                   </span>
                 </td>
 
-                <td style="padding:9px 8px 9px 0;vertical-align:middle;">
-                  <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:0.03em;text-transform:uppercase;
-                    color:{% if top3 %}#e0e0e0{% elif r.position <= 10 %}#555{% else %}#2e2e2e{% endif %};">
-                    {{ r.abbreviation }}
-                  </span>
-                  <span style="font-family:'Courier New',monospace;font-size:9px;color:#222;margin-left:6px;">
-                    {{ r.team | truncate(10, true, '') }}
-                  </span>
+                <td width="50" style="padding:12px 10px 12px 0;vertical-align:middle;">
+                  {% if r.image %}
+                  <img src="{{ r.image }}" width="40" height="40" 
+                      style="display:block;width:40px;height:40px;border-radius:50%;object-fit:cover;object-position:top;border:1px solid #333;">
+                  {% else %}
+                  <div style="width:40px;height:40px;border-radius:50%;background:#1a1a1a;border:1px solid #333;"></div>
+                  {% endif %}
                 </td>
 
-                <td align="right" style="padding:9px 2px;font-family:'Courier New',monospace;font-size:9px;
-                  color:{% if r.q1 and r.q1 != '-' %}#333{% else %}#1e1e1e{% endif %};">
-                  {{ r.q1 if r.q1 and r.q1 != '-' else '—' }}
+                <td style="padding:8px 6px 8px 0;vertical-align:middle;">
+                  <table role="presentation" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td style="width:2px;background:#{{ r.teamColor if r.teamColor else '333' }};margin-right:6px;">&nbsp;</td>
+                      <td style="padding-left:7px;">
+                        <span class="abbr-cell" style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:13px;letter-spacing:0.04em;text-transform:uppercase;
+                          color:{% if r.position <= 3 %}#e0e0e0{% elif r.position <= 10 %}#333{% else %}#2e2e2e{% endif %};">
+                          {{ r.abbreviation }}
+                        </span>
+                        <span class="team-cell" style="font-family:'Courier New',monospace;font-size:8px;color:#222;display:block;margin-top:1px;">
+                          {{ r.team | truncate(14, true, '') }}
+                        </span>
+                      </td>
+                    </tr>
+                  </table>
                 </td>
-                <td align="right" style="padding:9px 2px;font-family:'Courier New',monospace;font-size:9px;
-                  color:{% if r.q2 and r.q2 != '-' %}#333{% else %}#1e1e1e{% endif %};">
-                  {{ r.q2 if r.q2 and r.q2 != '-' else '—' }}
+
+                <td align="right" class="best-cell" style="padding:8px 4px;font-family:'Courier New',monospace;font-size:10px;color:#444;">
+                  {{ r.q3 }}
                 </td>
-                <td align="right" style="padding:9px 4px;font-family:'Courier New',monospace;font-size:9px;
-                  color:{% if r.q3 and r.q3 != '-' %}#777{% else %}#1e1e1e{% endif %};">
-                  {{ r.q3 if r.q3 and r.q3 != '-' else '—' }}
+
+                <td align="right" class="gap-cell" style="padding:8px 0 8px 4px;font-family:'Courier New',monospace;font-size:9px;color:#eee454;width:48px;">
+                  +{{ r.gap_to_pole }}
                 </td>
 
               </tr>
@@ -144,18 +172,119 @@
             </table>
           </td>
         </tr>
-
         <tr><td style="height:1px;background:#1a1a1a;font-size:0;line-height:0;">&nbsp;</td></tr>
+        {% endif %}
 
-        <!-- FOOTER -->
+        {% set q2_out = results | selectattr('position', 'ge', 11) | selectattr('position', 'le', 15) | list %}
+        {% if q2_out %}
         <tr>
-          <td style="background:#0a0a0a;padding:22px 32px;">
+          <td style="background:#0d0d0d;padding:18px 28px;" class="inner-pad">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td colspan="3" style="padding-bottom:12px;">
+                  <table role="presentation" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td style="background:#1e1e1e;padding:3px 8px;border-radius:2px;">
+                        <span style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.18em;color:#555;text-transform:uppercase;font-weight:700;">Q2</span>
+                      </td>
+                      <td style="padding-left:10px;">
+                        <span style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.14em;color:#222;text-transform:uppercase;">Eliminated · P11–15</span>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              {% for r in q2_out %}
+              <tr style="border-bottom:1px solid #111;">
+                <td width="24" style="padding:7px 0;font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:12px;color:#2a2a2a;vertical-align:middle;">
+                  {{ r.position }}
+                </td>
+                <td style="padding:7px 6px 7px 0;vertical-align:middle;">
+                  <table role="presentation" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td style="width:2px;background:#{{ r.teamColor if r.teamColor else '2a2a2a' }};border-radius:1px;">&nbsp;</td>
+                      <td style="padding-left:7px;">
+                        <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:12px;letter-spacing:0.04em;text-transform:uppercase;color:#333;">
+                          {{ r.abbreviation }}
+                        </span>
+                        <span style="font-family:'Courier New',monospace;font-size:8px;color:#1e1e1e;display:block;margin-top:1px;">
+                          {{ r.team | truncate(14, true, '') }}
+                        </span>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+                <td align="right" style="padding:7px 0;font-family:'Courier New',monospace;font-size:9px;color:#2a2a2a;">
+                  {{ r.q2 if r.q2 and r.q2 != '-' else '—' }}
+                </td>
+              </tr>
+              {% endfor %}
+            </table>
+          </td>
+        </tr>
+        <tr><td style="height:1px;background:#141414;font-size:0;line-height:0;">&nbsp;</td></tr>
+        {% endif %}
+
+        {% set q1_out = results | selectattr('position', 'ge', 16) | list %}
+        {% if q1_out %}
+        <tr>
+          <td style="background:#0a0a0a;padding:18px 28px;" class="inner-pad">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td colspan="3" style="padding-bottom:12px;">
+                  <table role="presentation" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td style="background:#141414;padding:3px 8px;border-radius:2px;">
+                        <span style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.18em;color:#333;text-transform:uppercase;font-weight:700;">Q1</span>
+                      </td>
+                      <td style="padding-left:10px;">
+                        <span style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.14em;color:#1e1e1e;text-transform:uppercase;">Eliminated · P16 – 20</span>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              {% for r in q1_out %}
+              <tr style="border-bottom:1px solid #0d0d0d;">
+                <td width="24" style="padding:7px 0;font-family:'Arial Narrow',Arial,sans-serif;font-weight:900;font-size:12px;color:#222;vertical-align:middle;">
+                  {{ r.position }}
+                </td>
+                <td style="padding:7px 6px 7px 0;vertical-align:middle;">
+                  <table role="presentation" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <!-- <td style="width:2px;background:#1e1e1e;border-radius:1px;">&nbsp;</td> -->
+                      <td style="width:2px;background: #{{ r.teamColor if r.teamColor else '333' }};margin-right:6px;">&nbsp;</td>
+
+                      <td style="padding-left:7px;">
+                        <span style="font-family:'Arial Narrow',Arial,sans-serif;font-weight:700;font-size:12px;letter-spacing:0.04em;text-transform:uppercase;color:#222;">
+                          {{ r.abbreviation }}
+                        </span>
+                        <span style="font-family:'Courier New',monospace;font-size:8px;color:#191919;display:block;margin-top:1px;">
+                          {{ r.team | truncate(14, true, '') }}
+                        </span>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+                <td align="right" style="padding:7px 0;font-family:'Courier New',monospace;font-size:9px;color:#222;">
+                  {{ r.q1 if r.q1 and r.q1 != '-' else '—' }}
+                </td>
+              </tr>
+              {% endfor %}
+            </table>
+          </td>
+        </tr>
+        <tr><td style="height:1px;background:#141414;font-size:0;line-height:0;">&nbsp;</td></tr>
+        {% endif %}
+
+        <tr>
+          <td style="background:#0a0a0a;padding:20px 28px;" class="inner-pad">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
               <tr>
                 <td>
                   <p style="margin:0;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.12em;color:#282828;text-transform:uppercase;line-height:1.8;">
-                    You subscribed at lightsout.vercel.app<br>
-                    <a href="{{ unsubscribe_url }}" style="color:#282828;text-decoration:none;">Unsubscribe</a>
+                    You subscribed at LightsOut<br>
+                    <a href="{{ unsubscribe_url }}" style="color:#117aaa;text-decoration:none;">Unsubscribe</a>
                   </p>
                 </td>
                 <td align="right" valign="bottom">
