@@ -24,7 +24,7 @@ from services.email_service import (
 )
 from utils.cache import cache_invalidate
 from config.database import AsyncSessionLocal
-from models import Subscriber
+from models import EmailLog, Subscriber
 from utils.constants import SESSION_RESULT_OFFSET
 import shutil, os
 
@@ -135,37 +135,32 @@ async def _send_race(year: int, round_number: int):
         logger.warning("Race outcome: no results yet for round %d", round_number)
     
 
-# THURSDAY SCHEDULE CHECKER
-async def job_thursday_check():
-    _clear_fastf1_cache()
-    schedule = await get_current_season_schedule()
-    race = _race_week(schedule)
-    if not race:
-        logger.info("Not a race weekend :(")
-        return
+async def _check_pre_race_status(race: dict, year: int, round_number: int, source: str):
+    """Send pre-race email only if not already sent for this race."""
+    async with AsyncSessionLocal() as db:
+        already_sent = await db.execute(
+            select(EmailLog).where(
+                EmailLog.email_type == "pre_race",
+                EmailLog.race_name == race["name"],
+                EmailLog.status == "sent",
+            ).limit(1)
+        )
+        if already_sent.scalar_one_or_none():
+            logger.info("Pre-race email already sent for %s, skipping", race["name"])
+            return
 
-    year = datetime.now(timezone.utc).year
-    round_number = race["round"]
-    is_sprint    = race.get("is_sprint", False)
-    logger.info("Race weekend: %s - Round %d (sprint=%s)", race["name"], round_number, is_sprint)
-
-    # Send pre-race email
     try:
         data = await get_pre_race_package(year, round_number)
         async with AsyncSessionLocal() as db:
             subs = await _active_subscribers(db)
             if subs:
                 await send_pre_race_email(subs, data, db)
-                logger.info("Pre-race email sent to %d subscribers", len(subs))
+                logger.info("Pre-race email sent to %d subscribers (%s)", len(subs), source)
     except Exception as e:
-        logger.error("Pre-race email error: %s", e)
-
-    for job, _, send_datetime, job_id in _schedule_weekend_jobs(race, year):
-        _schedule_job(job, send_datetime, job_id, [year, round_number])
+        logger.error("Pre-race email error (%s): %s", source, e)
 
 
 async def recover_missed_jobs():
-
     logger.info("Startup recovery check")
     schedule = await get_current_season_schedule()
     race = _race_week(schedule)
@@ -178,38 +173,37 @@ async def recover_missed_jobs():
     now = datetime.now(timezone.utc)
     logger.info("Active race weekend: %s - Round %d", race["name"], round_number)
 
-    # Reschedule any session result jobs still in the future
     recovered = 0
     for job, _, send_datetime, job_id in _schedule_weekend_jobs(race, year):
         if send_datetime > now:
             _schedule_job(job, send_datetime, job_id, [year, round_number])
-            logger.info("Recovered job: %s", job_id)
+            logger.info("Recovered job: %s at %s", job_id, send_datetime.strftime("%d %b %H:%M UTC"))
             recovered += 1
         else:
             logger.info("Past send window, skipping: %s", job_id)
-    
-    if recovered == 0:
-         logger.info("No future jobs to recover for this weekend")
-    
-    week_monday = (now - timedelta(days=now.weekday())).replace(
-        hour=0, minute=0, second=0, microsecond=0
-    )
-    thursday_job_time = week_monday + timedelta(days=3, hours=17)
 
-    if now < thursday_job_time:
-        logger.info("Sending pre-race email from recovery")
-        try:
-            data = await get_pre_race_package(year, round_number)
-            async with AsyncSessionLocal() as db:
-                subs = await _active_subscribers(db)
-                if subs:
-                    await send_pre_race_email(subs, data, db)
-                    logger.info("Pre-race email sent to %d subscribers (recovery)", len(subs))
-        except Exception as e:
-            logger.error("Pre-race email error during recovery: %s", e)
-    else:
-        logger.info("Post-Thursday restart — pre-race email already handled by cron")
-        
+    if recovered == 0:
+        logger.info("No future jobs to recover for this weekend")
+
+    await _check_pre_race_status(race, year, round_number, source="recovery")
+
+# THURSDAY SCHEDULE CHECKER
+async def job_thursday_check():
+   
+    _clear_fastf1_cache()
+    schedule = await get_current_season_schedule()
+    race = _race_week(schedule)
+    if not race:
+        logger.info("Not a race weekend :(")
+        return
+
+    year = datetime.now(timezone.utc).year
+    round_number = race["round"]
+    logger.info("Race weekend: %s - Round %d (sprint=%s)", race["name"], round_number, race.get("is_sprint", False))
+    await _check_pre_race_status(race, year, round_number, source="thursday_cron")
+
+    for job, _, send_datetime, job_id in _schedule_weekend_jobs(race, year):
+        _schedule_job(job, send_datetime, job_id, [year, round_number])
 
 def _schedule_weekend_jobs(race: dict, year: int) -> list[tuple]:
     round_number = race["round"]
