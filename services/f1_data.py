@@ -231,7 +231,10 @@ async def get_constructor_standings(year: int) -> list[dict]:
 
 def _driver_race_stats(row) -> dict:
     raw_status = str(row["Status"]).strip()
-    grid_pos = int(float(row["GridPosition"]))
+    try:
+        grid_pos = int(float(row["GridPosition"]))
+    except (ValueError, TypeError):
+        grid_pos = 0
     final_pos  = int(row["Position"])
  
     lapped_match = re.match(r"\+(\d+)\s+Lap", raw_status)
@@ -318,6 +321,8 @@ def get_qualifying_results(year: int, round_number: int) -> list[dict]:
         session = fastf1.get_session(year, round_number, "Qualifying")
         session.load(laps=False, telemetry=False, weather=False, messages=False)
         results = session.results.to_dict('records')
+        if not results:
+            return []
         pole_time = results[0].get("Q3")
         quali_results = []
 
