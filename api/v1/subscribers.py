@@ -81,7 +81,7 @@ async def verify(request: Request, token: str, db: AsyncSession = Depends(get_db
     try:
         await send_welcome_email(subscriber.email, subscriber.name or "F1 Fan", subscriber.unsubscribe_token, db)
     except Exception as e:
-        logger.warning("Expired verification token deleted: %s", subscriber.email)
+         logger.warning("Welcome email failed for %s: %s", subscriber.email, e)
 
     return RedirectResponse(url=f"{settings.frontend_url}/verify.html?status=success", status_code=302)
 
@@ -95,7 +95,7 @@ async def unsubscribe(request: Request, token: str, db: AsyncSession = Depends(g
         raise HTTPException(400, "Invalid unsubscribe link")
     
     if not subscriber.is_active:
-        return {"message": "Already unsubscribed."}
+        return HTTPException(400, "Already unsubscribed.")
 
     subscriber.is_active = False
     await db.commit()

@@ -5,7 +5,7 @@ WEEK  = 604800
 MONTH = 2592000
 
 CACHE_TTL = {
-    "schedule":               MONTH,
+    "schedule":               WEEK,
     "current_race_weekend":   WEEK,
     "driver_standings":       WEEK,
     "constructor_standings":  WEEK,

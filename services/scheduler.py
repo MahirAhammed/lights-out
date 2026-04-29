@@ -162,6 +162,7 @@ async def _check_pre_race_status(race: dict, year: int, round_number: int, sourc
 
 async def recover_missed_jobs():
     logger.info("Startup recovery check")
+    await cache_invalidate("schedule")
     schedule = await get_current_season_schedule()
     race = _race_week(schedule)
     if not race:
