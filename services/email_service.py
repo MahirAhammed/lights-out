@@ -78,7 +78,7 @@ async def send_welcome_email(to: str, name: str, unsubscribe_token: str, db: Asy
     )
 
 async def send_pre_race_email(subscribers: list[Subscriber], data: dict, db: AsyncSession):
-    race_name = data["track"].get("official_name", "Next Race")
+    race_name = data["track"].get("name", "Next Race")
     for sub in subscribers:
         if sub.pref_pre_race:
             local_schedule = {

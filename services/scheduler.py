@@ -13,8 +13,6 @@ from services.f1_data import (
     get_pre_race_package,
     get_qualifying_results,
     get_race_results_package,
-    get_sprint_results,
-    get_race_results,
 )
 from services.email_service import (
     send_pre_race_email,
@@ -66,10 +64,8 @@ def _session_start(race: dict, name: str) -> datetime | None:
 
 
 def _send_at(session_start: datetime, session_name: str) -> datetime:
-    offset = SESSION_RESULT_OFFSET.get(session_name, 3)
-    send_datetime = session_start + timedelta(hours=offset)
-    now = datetime.now(timezone.utc)
-    return send_datetime if send_datetime > now else now + timedelta(minutes=5)
+    offset = SESSION_RESULT_OFFSET.get(session_name, 7200)
+    return session_start + timedelta(seconds=offset)
 
 
 def _schedule_job(job_func, send_datetime: datetime, job_id: str, args: list):
@@ -162,7 +158,6 @@ async def _check_pre_race_status(race: dict, year: int, round_number: int, sourc
 
 async def recover_missed_jobs():
     logger.info("Startup recovery check")
-    await cache_invalidate("schedule")
     schedule = await get_current_season_schedule()
     race = _race_week(schedule)
     if not race:
@@ -176,22 +171,22 @@ async def recover_missed_jobs():
 
     recovered = 0
     for job, _, send_datetime, job_id in _schedule_weekend_jobs(race, year):
-        if send_datetime > now:
-            _schedule_job(job, send_datetime, job_id, [year, round_number])
-            logger.info("Recovered job: %s at %s", job_id, send_datetime.strftime("%d %b %H:%M UTC"))
-            recovered += 1
-        else:
+        if send_datetime <= now:
             logger.info("Past send window, skipping: %s", job_id)
+            continue
+
+        _schedule_job(job, send_datetime, job_id, [year, round_number])
+        logger.info("Recovered job: %s at %s", job_id, send_datetime.strftime("%d %b %H:%M UTC"))
+        recovered += 1
 
     if recovered == 0:
         logger.info("No future jobs to recover for this weekend")
-
     await _check_pre_race_status(race, year, round_number, source="recovery")
 
 # THURSDAY SCHEDULE CHECKER
 async def job_thursday_check():
-   
     _clear_fastf1_cache()
+    await cache_invalidate("schedule")
     schedule = await get_current_season_schedule()
     race = _race_week(schedule)
     if not race:
@@ -201,10 +196,11 @@ async def job_thursday_check():
     year = datetime.now(timezone.utc).year
     round_number = race["round"]
     logger.info("Race weekend: %s - Round %d (sprint=%s)", race["name"], round_number, race.get("is_sprint", False))
-    await _check_pre_race_status(race, year, round_number, source="thursday_cron")
+    await _check_pre_race_status(race, year, round_number, source="thursday_job")
 
     for job, _, send_datetime, job_id in _schedule_weekend_jobs(race, year):
         _schedule_job(job, send_datetime, job_id, [year, round_number])
+
 
 def _schedule_weekend_jobs(race: dict, year: int) -> list[tuple]:
     round_number = race["round"]
@@ -215,45 +211,22 @@ def _schedule_weekend_jobs(race: dict, year: int) -> list[tuple]:
         sprint_quali = _session_start(race, "Sprint Shootout") or _session_start(race, "Sprint Qualifying")
         if sprint_quali:
             jobs.append((
-                _send_qualifying, 
-                "Qualifying",
-                _send_at(sprint_quali, "Qualifying"), 
-                f"sprint_quali_{round_number}"
+                _send_qualifying, "Sprint Qualifying", _send_at(sprint_quali, "Qualifying"), f"sprint_quali_{round_number}"
             ))
 
         sprint_race = _session_start(race, "Sprint")
         if sprint_race:
-            jobs.append((
-                _send_sprint, 
-                "Sprint", 
-                _send_at(sprint_race, "Sprint"), 
-                f"sprint_{round_number}"
-            ))
+            jobs.append((_send_sprint, "Sprint", _send_at(sprint_race, "Sprint"), f"sprint_{round_number}"))
 
     qualis = _session_start(race, "Qualifying")
     if qualis:
-        jobs.append((
-            _send_qualifying,
-            "Qualifying",
-            _send_at(qualis, "Qualifying"), 
-            f"quali_{round_number}"
-        ))
+        jobs.append((_send_qualifying, "Qualifying", _send_at(qualis, "Qualifying"), f"quali_{round_number}"))
 
-    race_start = _session_start(race, "Race")
-    if race_start:
-        jobs.append((_send_race, "Race", _send_at(race_start, "Race"), f"race_{round_number}"))
+    main_race = _session_start(race, "Race")
+    if main_race:
+        jobs.append((_send_race, "Race", _send_at(main_race, "Race"), f"race_{round_number}"))
 
     return jobs
-
-
-def _clear_fastf1_cache(path: str = "/tmp/fastf1_cache"):
-    try:
-        if os.path.exists(path):
-            shutil.rmtree(path)
-            os.makedirs(path, exist_ok=True)
-            logger.info("FastF1 cache cleared at %s", path)
-    except Exception as e:
-        logger.warning("Failed to clear FastF1 cache: %s", e)
 
 
 def start_scheduler():
@@ -265,3 +238,13 @@ def start_scheduler():
     )
     scheduler.start()
     logger.info("Scheduler started -- Thursday check at 17:00 UTC")
+
+
+def _clear_fastf1_cache(path: str = "/tmp/fastf1_cache"):
+    try:
+        if os.path.exists(path):
+            shutil.rmtree(path)
+            os.makedirs(path, exist_ok=True)
+            logger.info("FastF1 cache cleared at %s", path)
+    except Exception as e:
+        logger.warning("Failed to clear FastF1 cache: %s", e)
